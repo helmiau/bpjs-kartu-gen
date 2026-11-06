@@ -5,8 +5,6 @@
  * semuanya dibaca di perangkat.
  */
 
-import { SCHEMA } from './schema.js';
-
 const MAX_IMAGE_BYTES = 10 * 1024 * 1024;
 
 /** Status pemindaian yang ditampilkan ke pengguna. */
@@ -41,11 +39,9 @@ async function fileToImageData(file) {
 /**
  * Cari kode QR pada ImageData.
  *
- * Gambar kartu utuh (1400 x 976 pada skala ekspor) tidak bisa didekode jsQR
- * secara utuh — pemindaian seluruh gambar selalu gagal karena latar peta
- * Indonesia menyerap terlalu banyak piksel. Karena itu seluruh gambar dicoba
- * lebih dulu, lalu dicoba pada wilayah kode yang diketahui dari schema, dan
- * terakhir pada wilayah kanvas yang diperkecil.
+ * Pemindaian seluruh gambar dicoba lebih dulu. Bila gagal — misalnya karena
+ * gambar beresolusi tinggi dengan banyak latar seperti peta — gambar dicoba
+ * lagi per wilayah (sisi kanan dan empat kuadran), lalu diperkecil setengahnya.
  *
  * @returns {string|null} teks isi kode, atau null bila tidak ditemukan
  */
@@ -59,22 +55,6 @@ function decodeImageData(imageData) {
   const full = window.jsQR(imageData.data, imageData.width, imageData.height, options);
   if (full && full.data) return full.data;
 
-  // Wilayah kode pada kanvas kartu, dari schema.js.
-  const scaleX = imageData.width / SCHEMA.width;
-  const scaleY = imageData.height / SCHEMA.height;
-  const qrElement = SCHEMA.sides[0].elements.find((element) => element.type === 'qrcode');
-  if (qrElement) {
-    const box = {
-      x: Math.max(0, Math.round(qrElement.x * scaleX)),
-      y: Math.max(0, Math.round(qrElement.y * scaleY)),
-      width: Math.round(qrElement.width * scaleX),
-      height: Math.round(qrElement.height * scaleY)
-    };
-    const found = decodeRegion(imageData, box, options);
-    if (found) return found;
-  }
-
-  // Cadangan: wilayah kanan dan kuadran, untuk kartu yang tata letaknya berbeda.
   const regions = candidateRegions(imageData.width, imageData.height);
   for (const region of regions) {
     const found = decodeRegion(imageData, region, options);
@@ -92,8 +72,8 @@ function decodeImageData(imageData) {
 }
 
 /**
- * Wilayah cadangan bila tata letak schema tidak memuat kode: sisi kanan
- * (tempat QR pada kartu), lalu empat kuadran.
+ * Wilayah cadangan bila seluruh gambar gagal: sisi kanan (tempat QR pada
+ * kartu), lalu empat kuadran.
  */
 function candidateRegions(width, height) {
   const regions = [];

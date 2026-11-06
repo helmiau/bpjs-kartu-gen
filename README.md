@@ -18,9 +18,13 @@ pengiriman data — semua proses berjalan di peramban.
 - **Form manual** 8 kolom peserta dengan validasi
 - **Pratinjau kartu** sisi depan dan sisi belakang
 - **Ekspor** JPG per sisi dan PDF gabungan (ukuran fisik 85,6 mm)
-- **Kode QR di kartu memuat base64 JSON lengkap**, sehingga kartu hasil cetak
-  bisa dipindai kembali untuk mengisi ulang seluruh form
 - **Riwayat cetak lokal** (localStorage), bisa dihapus
+
+Kartu tidak memuat kode QR/barcode. Alasannya: QR yang memuat base64 JSON
+lengkap (~324 karakter) membutuhkan 65 modul, dan agar bisa dipindai balik
+bloknya harus 260 piksel — ukuran itu menutupi hampir seluruh teks kartu. Karena
+itu tata letak teks dikembalikan persis seperti situs sumber, dan data masuk
+lewat jalur unggah, kamera, tempel, atau URL.
 
 ## Cara pakai
 
@@ -49,14 +53,13 @@ index.html              halaman utama
 assets/
   css/style.css         gaya antarmuka (tema terang & gelap)
   img/                  template kartu depan (PNG) & belakang (JPG)
-  vendor/               qrcode.js, jsQR.js, html2canvas.min.js (di-vendor)
+  vendor/               jsQR.js, html2canvas.min.js (di-vendor)
 js/
   app.js                orkestrasi: form, tombol, URL, riwayat
-  card.js               render kartu dua sisi + gambar QR
+  card.js               render kartu dua sisi
   scanner.js            pemindai QR dari gambar & kamera
   exporter.js           ekspor JPG dan perakitan PDF
   payload.js            base64 <-> JSON (tahan variasi nama kunci)
-  qr-content.js         susun isi kode QR
   date.js               konversi tanggal DD-MM-YYYY <-> YYYY-MM-DD
   validate.js           validasi kolom form
   pdf-size.js           ukuran halaman PDF
@@ -73,8 +76,8 @@ npm install
 npm test
 ```
 
-48 unit test mencakup konversi base64, tahan variasi nama kunci, konversi
-tanggal, validasi kolom, ukuran halaman PDF, dan isi kode QR.
+41 unit test mencakup konversi base64, tahan variasi nama kunci, konversi
+tanggal, validasi kolom, dan ukuran halaman PDF.
 
 ## Deploy ke GitHub Pages
 
@@ -92,10 +95,12 @@ memuat skrip dari CDN pihak ketiga saat runtime.
   aset dari repo itu sendiri.
 - **Aman terhadap XSS.** Semua nilai dimasukkan lewat `textContent`, tidak
   pernah `innerHTML`.
-- **Barcode Code 39 diganti QR.** Situs sumber membuat barcode lewat PHP
-  (`dynamic_barcode.php`). GitHub Pages tidak menjalankan PHP, dan keputusan
-  produk di sini adalah QR berisi base64 JSON lengkap agar kartu bisa dipindai
-  balik. Pustaka `qrcode-generator` di-*vendor* dipakai untuk membuatnya.
+- **Tidak ada kode QR di kartu.** Situs sumber membuat barcode Code 39 lewat
+  PHP (`dynamic_barcode.php`), yang mati di GitHub Pages. Alternatif QR berisi
+  base64 JSON lengkap diukur butuh blok 260 piksel agar bisa dipindai balik —
+  itu menutupi hampir seluruh teks kartu. Karena itu kartu dibiarkan tanpa kode,
+  dan tata letak teks mengikuti sumber. Pustaka `jsQR` tetap dipakai untuk
+  membaca QR dari berkas gambar dan kamera.
 - **Ukuran kartu 350 × 244 piksel**, sama dengan sumber. Ekspor memakai skala
   4× dengan batas 36 juta piksel agar peramban ponsel tidak kehabisan memori.
 - **Template depan berukuran 1,3 MB** dan dipakai apa adanya; rasio kanvas

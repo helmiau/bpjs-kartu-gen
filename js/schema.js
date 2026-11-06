@@ -1,11 +1,18 @@
 /**
- * Tata letak kartu BPJS. Koordinat mengikuti situs sumber agar hasil mirip.
+ * Tata letak kartu BPJS. Koordinat mengikuti situs sumber.
  *
  * Kanvas: 350 x 244 piksel.
- * Sisi depan: latar PNG + blok teks berprefiks + blok syarat + kode QR.
+ * Sisi depan: latar PNG + blok teks berprefiks + blok syarat-ketentuan.
  * Sisi belakang: latar JPG saja, tanpa elemen.
  *
  * Kolom fktpGigi dan statusPeserta tidak dicetak (sesuai sumber).
+ *
+ * Tidak ada blok kode QR/barcode di kartu. Alasannya: QR yang memuat base64
+ * JSON lengkap (~324 karakter) membutuhkan 65 modul, dan agar bisa dipindai
+ * balik bloknya harus 260 piksel — ukuran itu menutupi hampir seluruh teks
+ * kartu. Karena kebutuhan memindai balik kartu cetak dilepas, tata letak teks
+ * dikembalikan persis seperti sumber. Data tetap masuk lewat tempel base64,
+ * unggah gambar QR, kamera, atau parameter URL ?data=.
  */
 
 export const CARD_WIDTH = 350;
@@ -15,17 +22,10 @@ export const CARD_HEIGHT = 244;
 export const TERMS_TEXT =
   'Syarat dan Ketentuan :\n' +
   '1. Kartu Peserta harap dibawa Ketika berobat\n' +
-  '2. Apabila kartu ini disalahgunakan akan dikenakan saksi\n' +
+  '2. Apabila kartu ini disalahgunakan akan dikenakan sakni\n' +
   '3. apabila ada perubahan atau kehilangan Kartu segera lapor ke kantor BPJS Kesehatan setempat\n' +
   'BPJS Kesehatan Care Center 165\n' +
   'www.bpjs-kesehatan.go.id';
-
-/**
- * Ukuran blok QR. Sumber memakai 151 x 23 piksel untuk barcode Code 39,
- * tetapi pilihan produk di sini adalah QR berisi base64 JSON lengkap
- * (~350 karakter), sehingga butuh blok yang jauh lebih besar agar bisa dibaca.
- */
-export const QR_BLOCK = { x: 218, y: 55, width: 112, height: 112 };
 
 export const SCHEMA = {
   width: CARD_WIDTH,
@@ -99,18 +99,6 @@ export const SCHEMA = {
           prefix: 'Faskes 1:',
           x: 25, y: 184, width: 275, height: 20,
           fontSize: 11, fontFamily: 'Arial',
-          fontWeight: 'normal', fontStyle: 'normal',
-          textAlign: 'left', color: '#000000'
-        },
-        {
-          id: 'bpjs_qr',
-          type: 'qrcode',
-          field: 'nomorKartu',
-          label: 'QR',
-          prefix: '',
-          x: QR_BLOCK.x, y: QR_BLOCK.y,
-          width: QR_BLOCK.width, height: QR_BLOCK.height,
-          fontSize: 9, fontFamily: 'Arial',
           fontWeight: 'normal', fontStyle: 'normal',
           textAlign: 'left', color: '#000000'
         },

@@ -282,31 +282,6 @@ input[aria-invalid="true"], textarea[aria-invalid="true"] {
   line-height: 1.05;
 }
 
-.card-qr {
-  display: block;
-  padding: 0;
-  background: #ffffff;
-  overflow: hidden;
-}
-
-.card-qr-holder {
-  width: 100%;
-  height: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 10px;
-  color: #666;
-}
-
-.card-qr-holder svg {
-  display: block;
-  width: 100%;
-  height: 100%;
-}
-
-.card-qr-error { color: var(--error); }
-
 /* ---------------- Unduhan & riwayat ---------------- */
 
 .download-actions {

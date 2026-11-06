@@ -150,9 +150,18 @@ Jika halaman dibuka dengan `?data=<base64>`, form terisi otomatis saat muat.
 
 Dua sisi, skala menyesuaikan lebar layar.
 
-### FR-7 — Pembuatan QR isi base64
+### FR-7 — Kartu tanpa kode QR/barcode
 
-QR di sisi depan memuat base64 JSON lengkap, agar kartu hasil cetak bisa dipindai kembali untuk mengisi ulang form.
+Kartu tidak memuat kode QR maupun barcode.
+
+Alasan: QR yang memuat base64 JSON lengkap (~324 karakter) membutuhkan 65 modul
+pada level koreksi terendah. Agar bisa dipindai balik, satu modul perlu minimal
+4 piksel pada rasterisasi nyata, sehingga blok harus 260 piksel — ukuran itu
+menutupi hampir seluruh teks kartu. Karena kebutuhan memindai balik kartu cetak
+dilepas, tata letak teks dikembalikan persis seperti sumber.
+
+Data tetap masuk ke form lewat tempel base64, unggah gambar QR, kamera, atau
+parameter URL `?data=`.
 
 ### FR-8 — Ekspor JPG
 
@@ -197,7 +206,7 @@ Menyimpan beberapa cetakan terakhir di `localStorage` untuk diunduh ulang. Tidak
 | REQ-QRCAM-001 | Pindai QR dari kamera | `js/scanner.js` | TEST-QRCAM-001 |
 | REQ-CARD-001 | Render sisi depan 350×244 | `js/card.js` | TEST-CARD-001 |
 | REQ-CARD-002 | Render sisi belakang 350×244 | `js/card.js` | TEST-CARD-002 |
-| REQ-QRGEN-001 | QR memuat base64 JSON lengkap | `js/card.js` | TEST-QRGEN-001 |
+
 | REQ-EXP-001 | Ekspor JPG per sisi | `js/exporter.js` | TEST-EXP-001 |
 | REQ-EXP-002 | Ekspor PDF 85,6 mm | `js/exporter.js` | TEST-EXP-002 |
 | REQ-HIST-001 | Riwayat lokal tersimpan | `js/history.js` | TEST-HIST-001 |
@@ -322,7 +331,6 @@ Tidak ada rute API: tidak ada server.
 | Lapisan | Pilihan | Alasan |
 |---|---|---|
 | Halaman | HTML + CSS + JavaScript murni | Tanpa build step, langsung jalan di GitHub Pages |
-| QR (buat) | `qrcode-generator` (di-vendor) | Murni JS, menghasilkan SVG/kanvas |
 | QR (baca) | `jsQR` (di-vendor) | Pembaca QR murni JS untuk gambar & kamera |
 | Ekspor render | `html2canvas` (di-vendor) | Padanan langsung mesin ekspor situs sumber |
 | PDF | Perakitan PDF manual di JS | Menghindari dependensi berat; ukuran presisi |
@@ -348,7 +356,7 @@ Tidak ada basis data, tidak ada framework, tidak ada proses build. Semua pustaka
 ├─────────────────────────────────────────────┤
 │  schema.js      — tata letak kartu (JSON)   │
 ├─────────────────────────────────────────────┤
-│  vendor/ — qrcode, jsQR, html2canvas        │
+│  vendor/ — jsQR, html2canvas                 │
 │  assets/img/ — template depan & belakang    │
 └─────────────────────────────────────────────┘
 ```
@@ -637,11 +645,7 @@ GREEN: fungsi konversi.
 RED: 350×244 → sisi terpanjang 85,6 mm, sisi lain mengikuti rasio.
 GREEN: `pdfPageSizeMm`.
 
-**Irisan 8 — Isi QR**
-RED: `qrContent(data)` menghasilkan base64 yang didekode ke objek sama.
-GREEN: perangkai `buildPayload`.
-
-**Irisan 9 — Validasi**
+**Irisan 8 — Validasi**
 RED: `nomorKartu` kosong atau berisi huruf ditolak.
 GREEN: `validate`.
 
@@ -672,7 +676,7 @@ GREEN: `validate`.
 | Bulak-balik encode/decode | TEST-B64-005 |
 | Konversi tanggal | TEST-DATE-001 |
 | Ukuran halaman PDF | TEST-PDF-001 |
-| Isi QR | TEST-QRGEN-001 |
+
 | Validasi field | TEST-FORM-001 |
 | Pindai QR gambar | TEST-QRIMG-001 (manual, perlu fixture) |
 | Pindai QR kamera | TEST-QRCAM-001 (manual, perlu perangkat) |
@@ -739,7 +743,7 @@ Langkah: dorong ke `main` → Settings → Pages → Source: `main` / root → t
 - Buat `index.html` dengan struktur dua panel
 - Buat `assets/css/style.css`: token warna, tata letak grid, responsif 360/768/1280
 - Salin template depan & belakang ke `assets/img/`
-- Salin `qrcode.js`, `jsQR.js`, `html2canvas.min.js` ke `assets/vendor/`
+- Salin `jsQR.js` dan `html2canvas.min.js` ke `assets/vendor/`
 - Buat `404.html`
 - Buat `.nojekyll`
 
@@ -811,7 +815,7 @@ Langkah: dorong ke `main` → Settings → Pages → Source: `main` / root → t
 | AC-07 | Tombol unduh JKG/JPG menghasilkan berkas gambar yang bisa dibuka |
 | AC-08 | Tombol unduh PDF menghasilkan berkas dua halaman |
 | AC-09 | Halaman PDF sisi terpanjang 85,6 mm |
-| AC-10 | QR pada kartu memuat base64 yang dapat dipindai balik untuk mengisi form |
+| AC-10 | Kartu tidak memuat kode QR, dan tata letak teks mengikuti sumber tanpa ada blok yang menimpa teks |
 | AC-11 | Tidak ada permintaan jaringan berisi data peserta |
 | AC-12 | Halaman responsif di 360px dan 1280px tanpa elemen terpotong |
 | AC-13 | Konsol peramban bersih dari galat |

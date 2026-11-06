@@ -3,10 +3,11 @@
  *
  * Memakai tata letak dari schema.js. Semua nilai dimasukkan lewat textContent,
  * tidak pernah innerHTML, agar payload yang berisi HTML tidak jadi XSS.
+ *
+ * Kartu tidak memuat kode QR/barcode: lihat catatan pada schema.js.
  */
 
 import { SCHEMA } from './schema.js';
-import { qrContent } from './qr-content.js';
 import { fromFormDate } from './date.js';
 
 export { SCHEMA };
@@ -29,9 +30,8 @@ function fieldValue(formData, fieldName) {
  * Buat satu elemen blok kartu sesuai tipe.
  * @param {object} element deskripsi blok dari schema
  * @param {object} formData data peserta
- * @param {string} qrText isi kode QR yang sudah jadi base64
  */
-function createElement(element, formData, qrText) {
+function createElement(element, formData) {
   const box = document.createElement('div');
   box.className = `card-el card-${element.type}`;
   box.dataset.elementId = element.id;
@@ -49,15 +49,6 @@ function createElement(element, formData, qrText) {
     fontStyle: element.fontStyle || 'normal',
     textAlign: element.textAlign || 'left'
   });
-
-  if (element.type === 'qrcode') {
-    box.classList.add('card-qr');
-    const holder = document.createElement('div');
-    holder.className = 'card-qr-holder';
-    box.appendChild(holder);
-    box.__qrText = qrText;
-    return box;
-  }
 
   if (element.type === 'multiline') {
     box.classList.add('card-multiline');
@@ -98,9 +89,8 @@ export function renderSide(sideIndex, container, formData) {
   container.style.backgroundImage = side.background ? `url('${side.background}')` : 'none';
   container.innerHTML = '';
 
-  const qrText = qrContent(formData);
   side.elements.forEach((element) => {
-    container.appendChild(createElement(element, formData, qrText));
+    container.appendChild(createElement(element, formData));
   });
 }
 
@@ -110,61 +100,4 @@ export function renderCard(formData) {
     const container = document.getElementById(`cardCanvas${index}`);
     if (container) renderSide(index, container, formData);
   });
-  drawQrCodes(formData);
-}
-
-/**
- * Gambar QR ke setiap blok kode.
- *
- * QR dihasilkan lewat pustaka qrcode-generator yang di-vendor. Karena data
- * base64 panjang, versi QR dipilih otomatis oleh pustaka; bila data terlalu
- * panjang untuk versi maksimum, blok menampilkan pesan alih-alih gagal diam.
- */
-export function drawQrCodes(formData) {
-  const qrText = qrContent(formData);
-  document.querySelectorAll('.card-qr').forEach((box) => {
-    const holder = box.querySelector('.card-qr-holder');
-    if (!holder) return;
-    holder.innerHTML = '';
-
-    if (!qrText) {
-      holder.textContent = 'QR';
-      return;
-    }
-
-    try {
-      const qr = window.qrcode(0, 'M');
-      qr.addData(qrText);
-      qr.make();
-
-      const count = qr.getModuleCount();
-      const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
-      svg.setAttribute('viewBox', `0 0 ${count} ${count}`);
-      svg.setAttribute('shape-rendering', 'crispEdges');
-      svg.setAttribute('role', 'img');
-      svg.setAttribute('aria-label', 'Kode QR data peserta');
-
-      const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
-      path.setAttribute('d', buildQrPath(qr, count));
-      path.setAttribute('fill', '#000000');
-      svg.appendChild(path);
-      holder.appendChild(svg);
-    } catch (error) {
-      holder.textContent = 'QR terlalu panjang';
-      holder.classList.add('card-qr-error');
-    }
-  });
-}
-
-/** Susun satu path SVG dari modul-modul gelap QR. */
-function buildQrPath(qr, count) {
-  let d = '';
-  for (let row = 0; row < count; row += 1) {
-    for (let col = 0; col < count; col += 1) {
-      if (qr.isDark(row, col)) {
-        d += `M${col} ${row}h1v1h-1z`;
-      }
-    }
-  }
-  return d;
 }
