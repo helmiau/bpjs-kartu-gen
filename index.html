@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Generator Kartu BPJS — e-Kartu</title>
+  <meta name="description" content="Buat kartu peserta BPJS Kesehatan (Kartu Indonesia Sehat) langsung di perangkat Anda. Unduh JPG atau PDF tanpa server.">
+  <link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body>
+  <header class="site-header">
+    <div class="wrap">
+      <h1>Generator Kartu BPJS</h1>
+      <p class="tagline">Isi data peserta, lihat pratinjau, unduh JPG atau PDF. Semua diproses di perangkat Anda.</p>
+    </div>
+  </header>
+
+  <main class="wrap layout">
+    <!-- ============ PANEL KIRI: INPUT ============ -->
+    <section class="panel" aria-labelledby="heading-input">
+      <h2 id="heading-input">1. Data Peserta</h2>
+
+      <!-- Isi otomatis dari base64 -->
+      <div class="field-group">
+        <label for="b64Input">Isi otomatis dari kode base64</label>
+        <textarea id="b64Input" rows="3" spellcheck="false"
+          placeholder="Tempel kode base64 di sini, atau pindai QR kartu"></textarea>
+        <div class="button-row">
+          <button type="button" id="fillFromB64Btn" class="btn btn-secondary">Isi dari Kode</button>
+          <button type="button" id="clearB64Btn" class="btn btn-ghost">Bersihkan</button>
+        </div>
+        <p class="hint">Kode bisa berasal dari QR kartu lain atau dari URL <code>?data=</code>.</p>
+      </div>
+
+      <!-- Pemindai QR -->
+      <div class="field-group">
+        <span class="group-label" id="heading-scan">Pindai Kode QR</span>
+        <div class="button-row" role="group" aria-labelledby="heading-scan">
+          <button type="button" id="scanImageBtn" class="btn btn-secondary">Dari Gambar</button>
+          <button type="button" id="scanCameraBtn" class="btn btn-secondary">Dari Kamera</button>
+        </div>
+        <input type="file" id="qrImageInput" accept="image/*" hidden>
+        <p class="hint" id="scanStatus" role="status" aria-live="polite"></p>
+      </div>
+
+      <!-- Form peserta -->
+      <form id="pesertaForm" novalidate>
+        <div class="field-group">
+          <label for="nomorKartu">No. Kartu <span class="req" aria-hidden="true">*</span></label>
+          <input type="text" id="nomorKartu" name="nomorKartu" inputmode="numeric"
+                 autocomplete="off" maxlength="20" required
+                 aria-describedby="err-nomorKartu">
+          <p class="error" id="err-nomorKartu" role="alert"></p>
+        </div>
+
+        <div class="field-group">
+          <label for="nama">Nama Peserta <span class="req" aria-hidden="true">*</span></label>
+          <input type="text" id="nama" name="nama" autocomplete="off" maxlength="100" required
+                 aria-describedby="err-nama">
+          <p class="error" id="err-nama" role="alert"></p>
+        </div>
+
+        <div class="field-group">
+          <label for="alamat">Alamat <span class="req" aria-hidden="true">*</span></label>
+          <textarea id="alamat" name="alamat" rows="2" maxlength="200" required
+                    aria-describedby="err-alamat"></textarea>
+          <p class="error" id="err-alamat" role="alert"></p>
+        </div>
+
+        <div class="field-group">
+          <label for="tglLhr">Tanggal Lahir <span class="req" aria-hidden="true">*</span></label>
+          <input type="date" id="tglLhr" name="tglLhr" required aria-describedby="err-tglLhr">
+          <p class="error" id="err-tglLhr" role="alert"></p>
+        </div>
+
+        <div class="field-group">
+          <label for="nik">NIK <span class="req" aria-hidden="true">*</span></label>
+          <input type="text" id="nik" name="nik" inputmode="numeric"
+                 autocomplete="off" maxlength="20" required aria-describedby="err-nik">
+          <p class="error" id="err-nik" role="alert"></p>
+        </div>
+
+        <div class="field-group">
+          <label for="fktp">Faskes 1 <span class="req" aria-hidden="true">*</span></label>
+          <input type="text" id="fktp" name="fktp" autocomplete="off" maxlength="100" required
+                 aria-describedby="err-fktp">
+          <p class="error" id="err-fktp" role="alert"></p>
+        </div>
+
+        <div class="field-group">
+          <label for="fktpGigi">Faskes Gigi</label>
+          <input type="text" id="fktpGigi" name="fktpGigi" autocomplete="off" maxlength="100">
+          <p class="hint">Tidak dicetak di kartu, tetapi ikut tersimpan dalam kode QR.</p>
+        </div>
+
+        <div class="field-group">
+          <label for="statusPeserta">Status Peserta</label>
+          <input type="text" id="statusPeserta" name="statusPeserta" autocomplete="off" maxlength="20">
+          <p class="hint">Tidak dicetak di kartu, tetapi ikut tersimpan dalam kode QR.</p>
+        </div>
+      </form>
+    </section>
+
+    <!-- ============ PANEL KANAN: PRATINJAU & EKSPOR ============ -->
+    <section class="panel" aria-labelledby="heading-preview">
+      <h2 id="heading-preview">2. Pratinjau &amp; Unduhan</h2>
+
+      <div class="preview-list">
+        <figure class="preview">
+          <figcaption>Sisi Depan</figcaption>
+          <div class="preview-stage">
+            <div id="cardCanvas0" class="card-canvas" aria-label="Pratinjau sisi depan kartu BPJS"></div>
+          </div>
+        </figure>
+
+        <figure class="preview">
+          <figcaption>Sisi Belakang</figcaption>
+          <div class="preview-stage">
+            <div id="cardCanvas1" class="card-canvas" aria-label="Pratinjau sisi belakang kartu BPJS"></div>
+          </div>
+        </figure>
+      </div>
+
+      <div class="download-actions" role="group" aria-label="Tombol unduhan">
+        <button type="button" id="downloadFrontJpgBtn" class="btn btn-primary">Unduh JPG Depan</button>
+        <button type="button" id="downloadBackJpgBtn" class="btn btn-primary">Unduh JPG Belakang</button>
+        <button type="button" id="downloadPdfBtn" class="btn btn-accent">Unduh PDF (Depan + Belakang)</button>
+      </div>
+      <p class="hint" id="exportStatus" role="status" aria-live="polite"></p>
+
+      <div class="history">
+        <div class="history-head">
+          <h3>Riwayat Cetak</h3>
+          <button type="button" id="clearHistoryBtn" class="btn btn-ghost btn-small">Hapus</button>
+        </div>
+        <ul id="historyList" class="history-list"></ul>
+        <p class="hint" id="historyHint">Riwayat hanya tersimpan di perangkat ini.</p>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="wrap">
+      <p class="disclaimer">
+        <strong>Perhatian:</strong> kartu yang dihasilkan adalah tiruan visual untuk keperluan
+        latihan atau pratinjau. Kartu ini <strong>tidak sah secara hukum</strong> dan tidak
+        diverifikasi oleh BPJS Kesehatan.
+      </p>
+      <p class="note">
+        Tidak ada data yang dikirim ke server. Semua proses berjalan di peramban Anda.
+      </p>
+    </div>
+  </footer>
+
+  <!-- Pustaka yang di-vendor; tidak ada pemuatan dari CDN saat runtime. -->
+  <script src="assets/vendor/qrcode.js"></script>
+  <script src="assets/vendor/jsQR.js"></script>
+  <script src="assets/vendor/html2canvas.min.js"></script>
+
+  <!-- Modul aplikasi -->
+  <script type="module" src="js/app.js"></script>
+</body>
+</html>
