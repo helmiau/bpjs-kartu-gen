@@ -1,0 +1,11 @@
+# Dependensi pengembangan
+node_modules/
+
+# Berkas sistem & editor
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Berkas uji sementara
+*.log
+.tmp/
