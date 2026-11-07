@@ -428,7 +428,7 @@ Sisi depan — blok teks berprefiks, koordinat piksel mengikuti sumber:
 
 | id | Field | Prefiks | x | y | lebar | tinggi | ukuran font | gaya |
 |---|---|---|---|---|---|---|---|---|
-| `bpjs_no` | nomorKartu | `No. Kartu:` | 25 | 82 | 300 | 22 | 15 | bold |
+| `bpjs_no` | nomorKartu | `No. Kartu:` | 25 | 82 | 300 | 22 | 11 | normal |
 | `bpjs_nama` | nama | `Nama:` | 25 | 104 | 313 | 16 | 11 | normal |
 | `bpjs_alamat` | alamat | `Alamat:` | 25 | 120 | 313 | 28 | 11 | normal |
 | `bpjs_tanggal` | tglLhr | `Tgl Lahir:` | 25 | 148 | 275 | 14 | 11 | normal |
@@ -447,9 +447,13 @@ BPJS Kesehatan Care Center 165
 www.bpjs-kesehatan.go.id
 ```
 
-**Titik dua sejajar.** Kolom label dibuat berlebar tetap 70 piksel dan tanda
+**Font seragam.** Seluruh label dan nilai memakai **11px Arial normal**. Baris
+`No. Kartu` dulu 15px bold (menonjol seperti sumber), tetapi itu membuat
+ukuran label tidak seragam.
+
+**Titik dua sejajar.** Kolom label dibuat berlebar tetap 49 piksel dan tanda
 titik dua berlebar tetap 9 piksel, sehingga tanda `:` setiap baris jatuh di
-**x = 97 piksel** dan seluruh nilai data mulai di **x = 108 piksel**. Diukur
+**x = 76 piksel** dan seluruh nilai data mulai di **x = 87 piksel**. Diukur
 dengan `getBoundingClientRect` di peramban; selisih posisi antar baris 0 px.
 
 **Nilai panjang dipotong.** Tata letak memakai posisi absolut, jadi blok yang

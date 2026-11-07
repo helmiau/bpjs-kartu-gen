@@ -47,8 +47,11 @@ export const SCHEMA = {
           label: 'No. Kartu',
           prefix: 'No. Kartu:',
           x: 25, y: 82, width: 300, height: 22,
-          fontSize: 15, fontFamily: 'Arial',
-          fontWeight: 'bold', fontStyle: 'normal',
+          // Ukuran dan gaya font sama dengan baris lain: label dan nilai seragam
+          // 11px normal Arial. Baris ini dulu 15px bold (menonjol seperti
+          // sumber), tetapi itu membuat label dan nilai tidak seragam.
+          fontSize: 11, fontFamily: 'Arial',
+          fontWeight: 'normal', fontStyle: 'normal',
           textAlign: 'left', color: '#000000'
         },
         {

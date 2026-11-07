@@ -264,15 +264,18 @@ input[aria-invalid="true"], textarea[aria-invalid="true"] {
  *
  * Kolom label dibuat berlebar tetap sehingga tanda titik dua setiap baris
  * jatuh di posisi x yang sama, dan seluruh nilai data mulai dari kolom yang
- * sama pula. Lebar mengikuti label terpanjang, "No. Kartu" pada font 15px
- * bold, yaitu 70 piksel. Dengan itu titik dua berada di x = 25 + 70 + 2 = 97.
+ * sama pula.
+ *
+ * Lebar 49 piksel dipilih dari label terpanjang, "No. Kartu" pada 11px Arial
+ * normal = 46,48 px, ditambah 2 px celah grid. Dengan itu titik dua berada di
+ * x = 25 + 49 + 2 = 76 piksel.
  *
  * Catatan: elemen kartu memakai atribut data-element-id (lihat card.js), bukan
  * id HTML, karena beberapa kartu bisa tampil bersamaan.
  */
 .card-text {
   display: grid;
-  grid-template-columns: var(--label-col, 70px) auto minmax(0, 1fr);
+  grid-template-columns: var(--label-col, 49px) auto minmax(0, 1fr);
   align-items: center;
   gap: 0 2px;
 }
