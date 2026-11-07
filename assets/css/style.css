@@ -266,16 +266,16 @@ input[aria-invalid="true"], textarea[aria-invalid="true"] {
  * jatuh di posisi x yang sama, dan seluruh nilai data mulai dari kolom yang
  * sama pula.
  *
- * Lebar 49 piksel dipilih dari label terpanjang, "No. Kartu" pada 11px Arial
- * normal = 46,48 px, ditambah 2 px celah grid. Dengan itu titik dua berada di
- * x = 25 + 49 + 2 = 76 piksel.
+ * Lebar 52 piksel dipilih dari label terpanjang, "No. Kartu" pada 11px Arial
+ * bold = 49,5 px, ditambah 2 px celah grid dan 0,5 px toleransi. Dengan itu
+ * titik dua berada di x = 25 + 52 + 2 = 79 piksel.
  *
  * Catatan: elemen kartu memakai atribut data-element-id (lihat card.js), bukan
  * id HTML, karena beberapa kartu bisa tampil bersamaan.
  */
 .card-text {
   display: grid;
-  grid-template-columns: var(--label-col, 49px) auto minmax(0, 1fr);
+  grid-template-columns: var(--label-col, 52px) auto minmax(0, 1fr);
   align-items: center;
   gap: 0 2px;
 }

@@ -47,11 +47,11 @@ export const SCHEMA = {
           label: 'No. Kartu',
           prefix: 'No. Kartu:',
           x: 25, y: 82, width: 300, height: 22,
-          // Ukuran dan gaya font sama dengan baris lain: label dan nilai seragam
-          // 11px normal Arial. Baris ini dulu 15px bold (menonjol seperti
-          // sumber), tetapi itu membuat label dan nilai tidak seragam.
+          // Ukuran dan gaya font sama dengan baris lain: 11px Arial bold.
+          // Sebelumnya baris ini 11px normal saat semua font diseragamkan;
+          // sekarang seluruh teks dibuat bold sesuai permintaan.
           fontSize: 11, fontFamily: 'Arial',
-          fontWeight: 'normal', fontStyle: 'normal',
+          fontWeight: 'bold', fontStyle: 'normal',
           textAlign: 'left', color: '#000000'
         },
         {
@@ -62,7 +62,7 @@ export const SCHEMA = {
           prefix: 'Nama:',
           x: 25, y: 104, width: 313, height: 16,
           fontSize: 11, fontFamily: 'Arial',
-          fontWeight: 'normal', fontStyle: 'normal',
+          fontWeight: 'bold', fontStyle: 'normal',
           textAlign: 'left', color: '#000000'
         },
         {
@@ -73,7 +73,7 @@ export const SCHEMA = {
           prefix: 'Alamat:',
           x: 25, y: 120, width: 313, height: 28,
           fontSize: 11, fontFamily: 'Arial',
-          fontWeight: 'normal', fontStyle: 'normal',
+          fontWeight: 'bold', fontStyle: 'normal',
           textAlign: 'left', color: '#000000'
         },
         {
@@ -84,7 +84,7 @@ export const SCHEMA = {
           prefix: 'Tgl Lahir:',
           x: 25, y: 148, width: 275, height: 14,
           fontSize: 11, fontFamily: 'Arial',
-          fontWeight: 'normal', fontStyle: 'normal',
+          fontWeight: 'bold', fontStyle: 'normal',
           textAlign: 'left', color: '#000000'
         },
         {
@@ -95,7 +95,7 @@ export const SCHEMA = {
           prefix: 'NIK:',
           x: 25, y: 162, width: 275, height: 14,
           fontSize: 11, fontFamily: 'Arial',
-          fontWeight: 'normal', fontStyle: 'normal',
+          fontWeight: 'bold', fontStyle: 'normal',
           textAlign: 'left', color: '#000000'
         },
         {
@@ -106,7 +106,7 @@ export const SCHEMA = {
           prefix: 'Faskes 1:',
           x: 25, y: 176, width: 275, height: 14,
           fontSize: 11, fontFamily: 'Arial',
-          fontWeight: 'normal', fontStyle: 'normal',
+          fontWeight: 'bold', fontStyle: 'normal',
           textAlign: 'left', color: '#000000'
         },
         {
@@ -117,7 +117,7 @@ export const SCHEMA = {
           prefix: '',
           x: 26, y: 190, width: 286, height: 38,
           fontSize: 6, fontFamily: 'Arial',
-          fontWeight: 'normal', fontStyle: 'normal',
+          fontWeight: 'bold', fontStyle: 'normal',
           textAlign: 'left', color: '#000000'
         }
       ]
