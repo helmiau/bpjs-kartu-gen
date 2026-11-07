@@ -428,13 +428,13 @@ Sisi depan — blok teks berprefiks, koordinat piksel mengikuti sumber:
 
 | id | Field | Prefiks | x | y | lebar | tinggi | ukuran font | gaya |
 |---|---|---|---|---|---|---|---|---|
-| `bpjs_no` | nomorKartu | `No Kartu:` | 25 | 83 | 275 | 25 | 15 | bold |
-| `bpjs_nama` | nama | `Nama:` | 25 | 107 | 313 | 20 | 11 | normal |
-| `bpjs_alamat` | alamat | `Alamat:` | 25 | 123 | 313 | 31 | 11 | normal |
-| `bpjs_tanggal` | tglLhr | `Tgl Lahir:` | 25 | 153 | 275 | 20 | 11 | normal |
-| `bpjs_nik` | nik | `NIK:` | 25 | 169 | 275 | 20 | 11 | normal |
-| `bpjs_faskes` | fktp | `Faskes 1:` | 25 | 184 | 275 | 20 | 11 | normal |
-| `bpjs_syarat` | tetap | — | 26 | 199 | 286 | 38 | 6 | normal |
+| `bpjs_no` | nomorKartu | `No. Kartu:` | 25 | 82 | 300 | 22 | 15 | bold |
+| `bpjs_nama` | nama | `Nama:` | 25 | 104 | 313 | 16 | 11 | normal |
+| `bpjs_alamat` | alamat | `Alamat:` | 25 | 120 | 313 | 28 | 11 | normal |
+| `bpjs_tanggal` | tglLhr | `Tgl Lahir:` | 25 | 148 | 275 | 14 | 11 | normal |
+| `bpjs_nik` | nik | `NIK:` | 25 | 162 | 275 | 14 | 11 | normal |
+| `bpjs_faskes` | fktp | `Faskes 1:` | 25 | 176 | 275 | 14 | 11 | normal |
+| `bpjs_syarat` | tetap | — | 26 | 190 | 286 | 38 | 6 | normal |
 
 Blok syarat-ketentuan memuat teks tetap:
 
@@ -447,7 +447,16 @@ BPJS Kesehatan Care Center 165
 www.bpjs-kesehatan.go.id
 ```
 
-Blok kode QR: posisi `x:27, y:60`, ukuran `151 × 23` pada sumber. Karena pilihan pengguna adalah **QR berisi base64 JSON lengkap** (bukan barcode Code 39), ukuran blok ini harus ditambah agar QR cukup padat untuk menampung ~350 karakter base64. Ukuran final ditentukan saat implementasi dengan menguji keterbacaan (lihat §37).
+**Titik dua sejajar.** Kolom label dibuat berlebar tetap 70 piksel dan tanda
+titik dua berlebar tetap 9 piksel, sehingga tanda `:` setiap baris jatuh di
+**x = 97 piksel** dan seluruh nilai data mulai di **x = 108 piksel**. Diukur
+dengan `getBoundingClientRect` di peramban; selisih posisi antar baris 0 px.
+
+**Nilai panjang dipotong.** Tata letak memakai posisi absolut, jadi blok yang
+membesar ke bawah akan menimpa baris berikutnya. Karena itu jumlah baris nilai
+dibatasi: satu baris untuk semua blok kecuali `Alamat` yang dua baris, lewat
+`-webkit-line-clamp` pada `.card-value` (lihat `assets/css/style.css`). Nilai
+lengkap tetap tersimpan di form, riwayat, dan keluaran base64/URL.
 
 Sisi belakang: hanya latar, tanpa elemen. Kolom `fktpGigi` dan `statusPeserta` ditampilkan di form tetapi **tidak** dicetak di kartu agar selaras dengan sumber yang tidak punya kolom itu.
 

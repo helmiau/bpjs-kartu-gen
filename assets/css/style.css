@@ -251,7 +251,6 @@ input[aria-invalid="true"], textarea[aria-invalid="true"] {
   overflow: hidden;
   isolation: isolate;
 }
-
 .card-el {
   position: absolute;
   display: flex;
@@ -260,26 +259,67 @@ input[aria-invalid="true"], textarea[aria-invalid="true"] {
   line-height: 1.2;
 }
 
+/*
+ * Penyejajaran titik dua.
+ *
+ * Kolom label dibuat berlebar tetap sehingga tanda titik dua setiap baris
+ * jatuh di posisi x yang sama, dan seluruh nilai data mulai dari kolom yang
+ * sama pula. Lebar mengikuti label terpanjang, "No. Kartu" pada font 15px
+ * bold, yaitu 70 piksel. Dengan itu titik dua berada di x = 25 + 70 + 2 = 97.
+ *
+ * Catatan: elemen kartu memakai atribut data-element-id (lihat card.js), bukan
+ * id HTML, karena beberapa kartu bisa tampil bersamaan.
+ */
 .card-text {
   display: grid;
-  grid-template-columns: max-content auto minmax(0, 1fr);
+  grid-template-columns: var(--label-col, 70px) auto minmax(0, 1fr);
   align-items: center;
   gap: 0 2px;
 }
 
-.card-label { white-space: nowrap; }
-.card-separator { white-space: nowrap; padding: 0 2px; }
-
+/*
+ * Nilai panjang dipotong tepat pada batas kotak.
+ *
+ * Grid item tidak patuh pada max-height: 100% (nilai itu mengacu ke baris
+ * grid, bukan ke kotak), sehingga teks panjang meluber keluar dan menimpa
+ * baris kartu di bawahnya meski kotak sudah overflow: hidden. Karena itu
+ * jumlah baris nilai dibatasi eksplisit per blok di bawah.
+ */
 .card-value {
   min-width: 0;
+  align-self: start;
   overflow-wrap: anywhere;
   word-break: break-word;
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 1;
+}
+
+.card-label { white-space: nowrap; }
+
+/*
+ * Lebar titik dua dibuat tetap agar seluruh nilai data mulai dari kolom yang
+ * sama persis. Tanpa ini, titik dua pada font 15px bold lebih lebar daripada
+ * pada 11px, sehingga nilai No. Kartu bergeser ~2 px dari baris lainnya.
+ */
+.card-separator {
+  white-space: nowrap;
+  display: inline-block;
+  width: 9px;
+  text-align: left;
 }
 
 .card-multiline {
   align-items: flex-start;
   white-space: pre-wrap;
   line-height: 1.05;
+}
+
+/* Jumlah baris nilai yang diizinkan, mengikuti tinggi blok di schema.js:
+   No. Kartu, Nama, dan baris 14px satu baris; Alamat 28px dua baris. */
+.card-el[data-element-id="bpjs_alamat"] .card-value {
+  -webkit-line-clamp: 2;
 }
 
 /* ---------------- Unduhan & riwayat ---------------- */

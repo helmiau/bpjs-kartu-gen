@@ -41,6 +41,9 @@ function createElement(element, formData) {
     left: `${element.x}px`,
     top: `${element.y}px`,
     width: `${element.width}px`,
+    // height tetap, sesuai sumber: tata letak memakai posisi absolut, sehingga
+    // blok yang membesar ke bawah akan menimpa baris berikutnya. Nilai lebih
+    // panjang dari blok dipotong oleh overflow: hidden pada .card-el.
     height: `${element.height}px`,
     fontSize: `${element.fontSize}px`,
     color: element.color,

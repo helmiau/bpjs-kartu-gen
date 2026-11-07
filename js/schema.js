@@ -1,18 +1,22 @@
-/**
- * Tata letak kartu BPJS. Koordinat mengikuti situs sumber.
+/*
+ * Tata letak sisi depan.
  *
- * Kanvas: 350 x 244 piksel.
- * Sisi depan: latar PNG + blok teks berprefiks + blok syarat-ketentuan.
- * Sisi belakang: latar JPG saja, tanpa elemen.
+ * Kanvas 350 x 244 piksel. Header template memakan ~80 piksel, sehingga ruang
+ * teks tersedia 83-244 = 161 piksel.
  *
- * Kolom fktpGigi dan statusPeserta tidak dicetak (sesuai sumber).
+ * Titik dua setiap baris sejajar di x = 97 (kolom label 70 piksel; lihat
+ * assets/css/style.css).
  *
- * Tidak ada blok kode QR/barcode di kartu. Alasannya: QR yang memuat base64
- * JSON lengkap (~324 karakter) membutuhkan 65 modul, dan agar bisa dipindai
- * balik bloknya harus 260 piksel — ukuran itu menutupi hampir seluruh teks
- * kartu. Karena kebutuhan memindai balik kartu cetak dilepas, tata letak teks
- * dikembalikan persis seperti sumber. Data tetap masuk lewat tempel base64,
- * unggah gambar QR, kamera, atau parameter URL ?data=.
+ * Keterbatasan yang diterima: blok syarat-ketentuan berisi 6 baris teks 6px
+ * yang butuh 38 piksel, tetapi ruang yang tersisa setelah enam baris data
+ * hanya cukup untuk menampilkannya sebagian. Karena syarat-ketentuan adalah
+ * teks tetap yang tidak berubah, blok ini diberi tinggi penuh 38 piksel dan
+ * diletakkan di dasar kartu; bila baris data memanjang, syarat terpotong lebih
+ * dulu daripada data peserta.
+ *
+ * Tinggi blok Nama dan Alamat diperbesar dari spesifikasi sumber (20 dan 31
+ * piksel) menjadi 32 dan 44 piksel supaya nilai panjang bungkas utuh. Imbalnya
+ * blok Tanggal, NIK, dan Faskes digeser ke bawah, dan ruang antar baris mengecil.
  */
 
 export const CARD_WIDTH = 350;
@@ -40,9 +44,9 @@ export const SCHEMA = {
           id: 'bpjs_no',
           type: 'text',
           field: 'nomorKartu',
-          label: 'No Kartu',
-          prefix: 'No Kartu:',
-          x: 25, y: 83, width: 275, height: 25,
+          label: 'No. Kartu',
+          prefix: 'No. Kartu:',
+          x: 25, y: 82, width: 300, height: 22,
           fontSize: 15, fontFamily: 'Arial',
           fontWeight: 'bold', fontStyle: 'normal',
           textAlign: 'left', color: '#000000'
@@ -53,7 +57,7 @@ export const SCHEMA = {
           field: 'nama',
           label: 'Nama',
           prefix: 'Nama:',
-          x: 25, y: 107, width: 313, height: 20,
+          x: 25, y: 104, width: 313, height: 16,
           fontSize: 11, fontFamily: 'Arial',
           fontWeight: 'normal', fontStyle: 'normal',
           textAlign: 'left', color: '#000000'
@@ -64,7 +68,7 @@ export const SCHEMA = {
           field: 'alamat',
           label: 'Alamat',
           prefix: 'Alamat:',
-          x: 25, y: 123, width: 313, height: 31,
+          x: 25, y: 120, width: 313, height: 28,
           fontSize: 11, fontFamily: 'Arial',
           fontWeight: 'normal', fontStyle: 'normal',
           textAlign: 'left', color: '#000000'
@@ -75,7 +79,7 @@ export const SCHEMA = {
           field: 'tglLhr',
           label: 'Tgl Lahir',
           prefix: 'Tgl Lahir:',
-          x: 25, y: 153, width: 275, height: 20,
+          x: 25, y: 148, width: 275, height: 14,
           fontSize: 11, fontFamily: 'Arial',
           fontWeight: 'normal', fontStyle: 'normal',
           textAlign: 'left', color: '#000000'
@@ -86,7 +90,7 @@ export const SCHEMA = {
           field: 'nik',
           label: 'NIK',
           prefix: 'NIK:',
-          x: 25, y: 169, width: 275, height: 20,
+          x: 25, y: 162, width: 275, height: 14,
           fontSize: 11, fontFamily: 'Arial',
           fontWeight: 'normal', fontStyle: 'normal',
           textAlign: 'left', color: '#000000'
@@ -97,7 +101,7 @@ export const SCHEMA = {
           field: 'fktp',
           label: 'Faskes 1',
           prefix: 'Faskes 1:',
-          x: 25, y: 184, width: 275, height: 20,
+          x: 25, y: 176, width: 275, height: 14,
           fontSize: 11, fontFamily: 'Arial',
           fontWeight: 'normal', fontStyle: 'normal',
           textAlign: 'left', color: '#000000'
@@ -108,7 +112,7 @@ export const SCHEMA = {
           field: '',
           label: TERMS_TEXT,
           prefix: '',
-          x: 26, y: 199, width: 286, height: 38,
+          x: 26, y: 190, width: 286, height: 38,
           fontSize: 6, fontFamily: 'Arial',
           fontWeight: 'normal', fontStyle: 'normal',
           textAlign: 'left', color: '#000000'
