@@ -1,0 +1,448 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light dark">
+<title data-i18n="app.title">Generator Kartu BPJS - e-Kartu</title>
+  <meta name="description" content="Buat kartu peserta BPJS Kesehatan (Kartu Indonesia Sehat) langsung di perangkat Anda. Unduh JPG atau PDF tanpa server.">
+  <link rel="icon" type="image/svg+xml" href="assets/img/bpjs-mark.svg">
+  <link rel="icon" type="image/png" sizes="512x512" href="assets/img/bpjs-icon-512.png">
+  <link rel="apple-touch-icon" href="assets/img/bpjs-icon-180.png">
+  <link rel="stylesheet" href="assets/css/style.css?v=1.7.3">
+  <script>
+    // Tetapkan tema sebelum render agar tidak ada kedipan (FOUC).
+    (function () {
+      try {
+        var saved = localStorage.getItem('bpjs-theme');
+        var theme = saved || (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+        document.documentElement.setAttribute('data-theme', theme);
+      } catch (e) { /* tanpa storage: tetap terang */ }
+    })();
+  </script>
+</head>
+<body>
+  <header class="site-header">
+    <div class="wrap header-inner">
+      <div class="header-title">
+        <div class="brand">
+          <img class="brand-logo" src="assets/img/bpjs-mark.svg" alt="Logo BPJS Kesehatan" width="36" height="36">
+          <div class="brand-text">
+            <h1>Generator Kartu BPJS</h1>
+            <p class="tagline" data-i18n="header.tagline">Generator Kartu Indonesia Sehat &mdash; semua diproses di perangkat Anda.</p>
+          </div>
+        </div>
+      </div>
+      <div class="header-actions">
+        <div class="lang-switch" role="group" aria-label="Pilihan bahasa" data-i18n-aria="header.lang">
+          <button type="button" id="langIdBtn" class="lang-btn" aria-pressed="true">ID</button>
+          <button type="button" id="langEnBtn" class="lang-btn" aria-pressed="false">EN</button>
+        </div>
+        <button type="button" id="themeToggle" class="icon-btn theme-toggle"
+          aria-label="Ganti tema terang/gelap" title="Ganti tema" data-i18n-aria="header.theme" data-i18n-title="header.themeTitle">
+          <svg class="icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+               stroke-width="2" stroke-linecap="round" aria-hidden="true">
+            <circle cx="12" cy="12" r="4"></circle>
+            <path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"></path>
+          </svg>
+          <svg class="icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+               stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"></path>
+          </svg>
+        </button>
+        <a class="icon-btn" href="https://github.com/helmiau/bpjs-kartu-gen"
+           target="_blank" rel="noopener noreferrer"
+           aria-label="Lihat kode sumber di GitHub" title="Kode sumber di GitHub" data-i18n-aria="header.github" data-i18n-title="header.github">
+          <svg viewBox="0 0 16 16" fill="currentColor" aria-hidden="true">
+            <path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82a7.5 7.5 0 0 1 4 0c1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8z"></path>
+          </svg>
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <main class="wrap layout">
+    <!-- ============ PANEL KIRI: INPUT ============ -->
+    <div class="layout-left">
+    <section class="panel" aria-labelledby="heading-input">
+      <div class="section-head is-collapsible">
+        <span class="head-icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="3" y="4" width="18" height="16" rx="2"></rect>
+            <path d="M7 9h10M7 13h6"></path>
+          </svg>
+        </span>
+        <div class="head-text">
+          <h2 id="heading-input"><span data-i18n="input.heading">Data Peserta</span> <span class="pill-tag" data-i18n="input.tag">Wajib Lengkap</span></h2>
+          <p class="sub" data-i18n="input.sub">Kelola nomor kartu, nama, NIK, faskes &mdash; isi manual atau otomatis.</p>
+        </div>
+        <button type="button" id="inputToggleBtn" class="collapse-toggle" aria-expanded="true" aria-controls="inputBody" aria-label="Lipat/buka panel Data Peserta" title="Lipat/buka" data-i18n-aria="input.toggle">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M6 9l6 6 6-6"></path>
+          </svg>
+        </button>
+      </div>
+
+      <div id="inputBody" class="panel-body">
+
+      <div class="mode-switch" role="tablist" aria-label="Mode masukan">
+        <button type="button" id="modeSingleBtn" role="tab" aria-selected="true" aria-controls="singleMode" class="mode-btn is-active" data-i18n="mode.single">
+          Single
+        </button>
+        <button type="button" id="modeBatchBtn" role="tab" aria-selected="false" aria-controls="batchMode" class="mode-btn" data-i18n="mode.batch">
+          Batch
+        </button>
+      </div>
+
+      <div id="singleMode" role="tabpanel" aria-labelledby="modeSingleBtn">
+
+      <!-- Selector input otomatis: tempel kode / unggah gambar / kamera -->
+      <div class="field-group quick-fill">
+        <div class="quick-fill-head">
+          <span class="quick-fill-title" data-i18n="qf.title">Isi otomatis data</span>
+          <span class="pill-tag" data-i18n-html="qf.tag">QR &amp; Base64</span>
+        </div>
+        <p class="quick-fill-sub" data-i18n="qf.sub">Isi otomatis via kode tertempel, unggah foto kartu, atau kamera.</p>
+        <div class="selector-row">
+          <button type="button" id="scanImageBtn" class="btn selector-btn">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="2"></rect><path d="M8 12l3 3 5-6"></path></svg>
+            <span data-i18n="qf.upload">Unggah gambar</span>
+          </button>
+          <button type="button" id="scanCameraBtn" class="btn selector-btn">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path><circle cx="12" cy="13" r="4"></circle></svg>
+            <span data-i18n="qf.camera">Kamera</span>
+          </button>
+        </div>
+        <label for="b64Input" class="b64-label" data-i18n="qf.b64label">Kode base64 hasil paste / pindai</label>
+        <textarea id="b64Input" rows="2" spellcheck="false"
+          placeholder="Tempel kode base64 di sini, atau hasil pindai QR akan muncul otomatis" data-i18n-placeholder="qf.b64placeholder"></textarea>
+        <div class="button-row">
+          <button type="button" id="fillFromB64Btn" class="btn btn-primary btn-small" data-i18n="qf.fill"><svg class="btn-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="20 6 9 17 4 12"></polyline></svg><span data-i18n="qf.fill">Isi dari Kode</span></button>
+          <button type="button" id="clearB64Btn" class="btn btn-clear btn-small" data-i18n="qf.clear"><svg class="btn-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg><span data-i18n="qf.clear">Bersihkan</span></button>
+        </div>
+        <input type="file" id="qrImageInput" accept="image/*" hidden>
+        <p class="hint" id="scanStatus" role="status" aria-live="polite"></p>
+      </div>
+
+      <hr class="divider">
+
+      <!-- Form manual (P0) -->
+      <form id="pesertaForm" novalidate>
+        <div class="field-group">
+          <label for="nomorKartu" data-i18n-html="f.nomorKartuHtml">No. Kartu <span class="req" aria-hidden="true">*</span></label>
+          <input type="text" id="nomorKartu" name="nomorKartu" inputmode="numeric"
+                 autocomplete="off" maxlength="20" required
+                 aria-describedby="err-nomorKartu">
+          <p class="error" id="err-nomorKartu" role="alert"></p>
+        </div>
+        <div class="field-group">
+          <label for="nama" data-i18n-html="f.namaHtml">Nama Peserta <span class="req" aria-hidden="true">*</span></label>
+          <input type="text" id="nama" name="nama" autocomplete="off" maxlength="100" required
+                 aria-describedby="err-nama">
+          <p class="error" id="err-nama" role="alert"></p>
+        </div>
+        <div class="field-group">
+          <label for="alamat" data-i18n-html="f.alamatHtml">Alamat <span class="req" aria-hidden="true">*</span></label>
+          <textarea id="alamat" name="alamat" rows="2" maxlength="200" required
+                    aria-describedby="err-alamat"></textarea>
+          <p class="error" id="err-alamat" role="alert"></p>
+        </div>
+        <div class="field-row">
+          <div class="field-group">
+            <label for="tglLhr" data-i18n-html="f.tglLhrHtml">Tanggal Lahir <span class="req" aria-hidden="true">*</span></label>
+            <input type="date" id="tglLhr" name="tglLhr" required aria-describedby="err-tglLhr">
+            <p class="error" id="err-tglLhr" role="alert"></p>
+          </div>
+          <div class="field-group">
+            <label for="nik" data-i18n-html="f.nikHtml">NIK <span class="req" aria-hidden="true">*</span></label>
+            <input type="text" id="nik" name="nik" inputmode="numeric"
+                   autocomplete="off" maxlength="20" required aria-describedby="err-nik">
+            <p class="error" id="err-nik" role="alert"></p>
+          </div>
+        </div>
+        <div class="field-group">
+          <label for="fktp" data-i18n-html="f.fktpHtml">Faskes 1 <span class="req" aria-hidden="true">*</span></label>
+          <input type="text" id="fktp" name="fktp" autocomplete="off" maxlength="100" required
+                 aria-describedby="err-fktp">
+          <p class="error" id="err-fktp" role="alert"></p>
+        </div>
+        <div class="field-row">
+          <div class="field-group">
+            <label for="fktpGigi" data-i18n="f.fktpGigi">Faskes Gigi</label>
+            <input type="text" id="fktpGigi" name="fktpGigi" autocomplete="off" maxlength="100">
+            <p class="hint" data-i18n="f.qrhint">Ikut tersimpan dalam kode QR.</p>
+          </div>
+          <div class="field-group">
+            <label for="statusPeserta" data-i18n="f.status">Status Peserta</label>
+            <input type="text" id="statusPeserta" name="statusPeserta" autocomplete="off" maxlength="20">
+            <p class="hint" data-i18n="f.qrhint">Ikut tersimpan dalam kode QR.</p>
+          </div>
+        </div>
+      </form>
+      </div><!-- /#singleMode -->
+
+      <div id="batchMode" role="tabpanel" aria-labelledby="modeBatchBtn" hidden>
+        <div class="field-group quick-fill">
+          <label data-i18n="batch.import">Impor data peserta (Excel, CSV, atau tempel)</label>
+          <div class="preview-tabs" role="tablist" aria-label="Sumber data batch">
+            <button type="button" class="preview-tab is-active" role="tab" aria-selected="true" data-batch-tab="file" id="batchTabFileBtn" data-i18n="batch.tabFile">Impor file</button>
+            <button type="button" class="preview-tab" role="tab" aria-selected="false" data-batch-tab="paste" id="batchTabPasteBtn" data-i18n="batch.tabPaste">Tempel teks</button>
+          </div>
+          <div class="batch-pane" id="batchPaneFile" role="tabpanel">
+            <div class="batch-template">
+              <span class="hint" data-i18n="batch.template">Unduh template:</span>
+              <button type="button" id="tplCsvBtn" class="btn btn-ghost btn-small" data-i18n="batch.tplCsv">CSV</button>
+              <button type="button" id="tplTsvBtn" class="btn btn-ghost btn-small" data-i18n="batch.tplTsv">TSV</button>
+              <button type="button" id="tplXlsxBtn" class="btn btn-ghost btn-small" data-i18n="batch.tplXlsx">XLSX</button>
+            </div>
+            <div class="batch-dropzone" id="batchDropzone" tabindex="0" role="button"
+              aria-label="Seret berkas CSV, Excel, atau gambar QR ke sini, atau klik untuk memilih" data-i18n-aria="batch.dropAria">
+              <svg class="dropzone-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                <polyline points="17 8 12 3 7 8"></polyline>
+                <line x1="12" y1="3" x2="12" y2="15"></line>
+              </svg>
+              <p class="dropzone-text" data-i18n="batch.dropText">Seret berkas ke sini, atau klik untuk memilih</p>
+              <p class="dropzone-hint" data-i18n="batch.dropHint">CSV, TSV, XLSX, atau banyak gambar QR (.png/.jpg) sekaligus</p>
+              <span class="hint" id="batchFileName"></span>
+            </div>
+            <input type="file" id="batchFileInput" accept=".xlsx,.csv,.tsv,.txt,image/*" multiple hidden>
+          </div>
+          <div class="batch-pane" id="batchPanePaste" role="tabpanel" hidden>
+            <p class="hint" data-i18n="batch.pasteHelp">Tempel data TSV/CSV (satu baris per peserta) atau kode base64 (satu per baris). Format terdeteksi otomatis.</p>
+            <textarea id="batchPasteInput" rows="5" spellcheck="false"
+              placeholder="Nomor Kartu&#9;Nama&#9;Alamat&#9;Tanggal Lahir&#9;NIK&#9;Faskes&#10;0000000000000&#9;NAMA CONTOH&#9;ALAMAT CONTOH&#9;22-12-1997&#9;0000000000000000&#9;FASKES CONTOH&#10;atau: eyJub21vckthcnR1IjoiMC4uLiJ9" data-i18n-placeholder="batch.pastePlaceholder"></textarea>
+            <div class="button-row">
+              <button type="button" id="batchPasteBtn" class="btn btn-secondary btn-small" data-i18n="batch.pasteProcess"><svg class="btn-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg><span data-i18n="batch.pasteProcess">Proses &amp; tambah</span></button>
+              <button type="button" id="batchPasteClearBtn" class="btn btn-clear btn-small" data-i18n="batch.pasteClear"><svg class="btn-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg><span data-i18n="batch.pasteClear">Bersihkan</span></button>
+            </div>
+          </div>
+          <p class="hint" id="batchStatus" role="status" aria-live="polite"></p>
+        </div>
+
+        <div class="batch-queue-head">
+          <span class="group-label small"><span data-i18n="batch.queue">Antrean kartu</span> <span id="batchCount" class="pill-tag">0</span></span>
+          <div class="button-row">
+            <button type="button" id="batchSelectAllBtn" class="btn btn-ghost btn-small" data-i18n="batch.selectAll">Pilih semua</button>
+            <button type="button" id="batchRemoveBtn" class="btn btn-ghost btn-small" data-i18n="batch.remove">Hapus terpilih</button>
+          </div>
+        </div>
+        <div class="batch-table-wrap">
+          <table class="batch-table" id="batchTable">
+            <thead>
+              <tr>
+                <th><input type="checkbox" id="batchHeadCheck" aria-label="Pilih semua baris"></th>
+                <th>No</th>
+                <th data-i18n="batch.colKartu">No. Kartu</th>
+                <th data-i18n="batch.colNama">Nama</th>
+                <th data-i18n="batch.colFaskes">Faskes</th>
+                <th data-i18n="batch.colStatus">Status</th>
+              </tr>
+            </thead>
+            <tbody id="batchTableBody">
+              <tr class="batch-empty"><td colspan="6" data-i18n="batch.empty">Belum ada data. Unggah berkas atau tempel di atas.</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="download-actions">
+          <button type="button" id="batchExportPdfBtn" class="btn btn-primary" data-i18n="batch.export">Unduh PDF massal</button>
+        </div>
+        <p class="hint export-status" id="batchExportStatus" role="status" aria-live="polite"></p>
+      </div><!-- /#batchMode -->
+      </div><!-- /#inputBody -->
+    </section>
+
+    <!-- ============ PANEL: PENGATURAN RENDER & VISUAL (section berdiri sendiri) ============ -->
+    <section class="panel settings-panel" aria-labelledby="heading-settings">
+      <div class="section-head is-collapsible" id="settingsHead">
+        <span class="head-icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="4" y1="21" x2="4" y2="14"></line>
+            <line x1="4" y1="10" x2="4" y2="3"></line>
+            <line x1="12" y1="21" x2="12" y2="12"></line>
+            <line x1="12" y1="8" x2="12" y2="3"></line>
+            <line x1="20" y1="21" x2="20" y2="16"></line>
+            <line x1="20" y1="12" x2="20" y2="3"></line>
+            <line x1="1" y1="14" x2="7" y2="14"></line>
+            <line x1="9" y1="8" x2="15" y2="8"></line>
+            <line x1="17" y1="16" x2="23" y2="16"></line>
+          </svg>
+        </span>
+        <div class="head-text">
+          <h2 id="heading-settings" data-i18n="settings.heading">Pengaturan Render &amp; Visual</h2>
+          <p class="sub" data-i18n="settings.sub">Kustomisasi elemen visual, efek fotokopi, dan proteksi cetak.</p>
+        </div>
+        <button type="button" id="settingsToggleBtn" class="collapse-toggle" aria-expanded="true" aria-controls="settingsBody" aria-label="Lipat/buka Pengaturan Render &amp; Visual" title="Lipat/buka" data-i18n-aria="settings.toggle">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M6 9l6 6 6-6"></path>
+          </svg>
+        </button>
+      </div>
+      <div id="settingsBody" class="panel-body">
+        <label class="barcode-toggle" for="barcodeToggle">
+          <input type="checkbox" id="barcodeToggle" checked>
+          <span data-i18n="preview.barcode">Tampilkan barcode 1D Code-128 di atas kartu</span>
+        </label>
+        <label class="barcode-toggle" for="copyMarkToggle">
+          <input type="checkbox" id="copyMarkToggle" checked>
+          <span data-i18n="preview.watermark">Watermark teks "COPY" di sisi kanan kartu</span>
+        </label>
+        <label class="barcode-toggle" for="autoCapsToggle">
+          <input type="checkbox" id="autoCapsToggle" checked>
+          <span data-i18n="preview.autoCaps">Huruf kapital otomatis untuk nama</span>
+        </label>
+        <label class="barcode-toggle" for="photoCopyToggle">
+          <input type="checkbox" id="photoCopyToggle">
+          <span data-i18n="preview.copy">Fotokopi hitam-putih (JPG &amp; PDF)</span>
+        </label>
+        <label class="barcode-toggle" for="rasterPdfToggle">
+          <input type="checkbox" id="rasterPdfToggle">
+          <span data-i18n="preview.raster">Rasterisasi PDF (teks tidak bisa diedit)</span>
+        </label>
+        <p class="hint export-status" id="exportStatus" role="status" aria-live="polite"></p>
+      </div>
+    </section>
+    <section class="panel a4-panel" aria-labelledby="heading-a4">
+      <div class="section-head is-collapsible" id="a4Head">
+        <span class="head-icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M6 9V2h12v7"></path>
+            <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path>
+            <rect x="6" y="14" width="12" height="8" rx="1"></rect>
+          </svg>
+        </span>
+        <div class="head-text">
+          <h2 id="heading-a4" data-i18n="a4.heading">Layout Cetak A4 Bolak-Balik (Duplex)</h2>
+          <p class="sub" data-i18n="a4.sub">Sisi depan &amp; belakang dalam 1 lembar A4, siap lipat &amp; cetak.</p>
+        </div>
+        <button type="button" id="a4ToggleBtn" class="collapse-toggle" aria-expanded="true" aria-controls="a4Body" aria-label="Lipat/buka Layout Cetak A4" title="Lipat/buka" data-i18n-aria="a4.toggle">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M6 9l6 6 6-6"></path>
+          </svg>
+        </button>
+      </div>
+      <div id="a4Body" class="panel-body">
+        <div class="a4-mode" role="radiogroup" aria-label="Format & posisi cetak" data-i18n-aria="a4.modeLabel">
+          <label class="a4-mode-opt">
+            <input type="radio" name="a4Mode" value="side-by-side" checked>
+            <span data-i18n="a4.modeSide">Berdampingan (lipat kiri-kanan)</span>
+          </label>
+          <label class="a4-mode-opt">
+            <input type="radio" name="a4Mode" value="vertical">
+            <span data-i18n="a4.modeVert">Vertikal (lipat atas-bawah)</span>
+          </label>
+          <label class="a4-mode-opt">
+            <input type="radio" name="a4Mode" value="grid">
+            <span data-i18n="a4.modeGrid">Grid lembar penuh A4 (grid)</span>
+          </label>
+        </div>
+        <label class="barcode-toggle" for="a4Crop">
+          <input type="checkbox" id="a4Crop">
+          <span data-i18n="a4.crop">Tampilkan crop marks (garis potong)</span>
+        </label>
+        <label class="barcode-toggle" for="a4Fold">
+          <input type="checkbox" id="a4Fold" checked>
+          <span data-i18n="a4.fold">Garis putus lipatan tengah (fold line)</span>
+        </label>
+        <p class="hint" data-i18n="a4.size">Ukuran kartu: 85,60 × 53,98 mm (ISO/IEC 7810 ID-1).</p>
+        <div class="download-actions">
+          <button type="button" id="a4PrintBtn" class="btn btn-primary" data-i18n="a4.print">Simpan PDF A4 Duplex</button>
+        </div>
+        <p class="hint export-status" id="a4Status" role="status" aria-live="polite"></p>
+      </div>
+    </section>
+    </div><!-- /.layout-left -->
+
+    <!-- ============ PANEL KANAN: PRATINJAU & EKSPOR (sticky) ============ -->
+    <section class="panel preview-panel" aria-labelledby="heading-preview">
+      <div class="section-head">
+        <span class="head-icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="2" y="5" width="20" height="14" rx="2"></rect>
+            <path d="M2 10h20"></path>
+          </svg>
+        </span>
+        <div class="head-text">
+          <h2 id="heading-preview" data-i18n="preview.heading">Pratinjau &amp; Unduhan</h2>
+          <p class="sub" data-i18n="preview.sub">Depan &amp; belakang kartu, siap JPG atau PDF.</p>
+        </div>
+      </div>
+      <div class="preview-tabs" role="tablist" aria-label="Tampilan_preview">
+        <button type="button" id="previewTabFront" role="tab" aria-selected="true" aria-controls="previewFront" class="preview-tab is-active" data-i18n="preview.tabFront">Sisi Depan</button>
+        <button type="button" id="previewTabBack" role="tab" aria-selected="false" aria-controls="previewBack" class="preview-tab" data-i18n="preview.tabBack">Sisi Belakang</button>
+        <button type="button" id="previewTabA4" role="tab" aria-selected="false" aria-controls="previewA4" class="preview-tab" data-i18n="preview.tabA4">Simulasi A4 Duplex</button>
+      </div>
+      <div class="preview-toolbar" role="group" aria-label="Navigasi kartu">
+        <button type="button" id="prevCardBtn" class="btn btn-ghost btn-small" disabled aria-label="Kartu sebelumnya" data-i18n="preview.prev">◂ Sebelumnya</button>
+        <span class="preview-counter" id="previewCounter" data-i18n="preview.counter">Kartu #1 / 1</span>
+        <button type="button" id="nextCardBtn" class="btn btn-ghost btn-small" disabled aria-label="Kartu berikutnya" data-i18n="preview.next">Berikutnya ▸</button>
+      </div>
+      <div class="preview-list">
+        <figure class="preview" id="previewFront" role="tabpanel">
+          <figcaption data-i18n="preview.front">Sisi Depan</figcaption>
+          <div class="preview-stage">
+            <div id="cardCanvas0" class="card-canvas" aria-label="Pratinjau sisi depan kartu BPJS"></div>
+          </div>
+        </figure>
+        <figure class="preview" id="previewBack" role="tabpanel" hidden>
+          <figcaption data-i18n="preview.back">Sisi Belakang</figcaption>
+          <div class="preview-stage">
+            <div id="cardCanvas1" class="card-canvas" aria-label="Pratinjau sisi belakang kartu BPJS"></div>
+          </div>
+        </figure>
+        <figure class="preview" id="previewA4" role="tabpanel" hidden>
+          <figcaption data-i18n="preview.tabA4">Simulasi A4 Duplex</figcaption>
+          <div class="preview-stage">
+            <div id="a4PreviewCanvas" class="card-canvas" aria-label="Simulasi lembar A4 duples"></div>
+          </div>
+        </figure>
+      </div>
+      <div class="download-actions" role="group" aria-label="Tombol unduhan">
+        <button type="button" id="downloadPdfBtn" class="btn btn-primary" data-i18n="preview.pdf">Unduh PDF</button>
+        <button type="button" id="downloadFrontJpgBtn" class="btn btn-secondary" data-i18n="preview.frontJpg">JPG Depan</button>
+        <button type="button" id="downloadBackJpgBtn" class="btn btn-secondary" data-i18n="preview.backJpg">JPG Belakang</button>
+      </div>
+      <p class="download-note" id="downloadNote" hidden data-i18n="preview.note">Lengkapi kolom bertanda * untuk mengunduh kartu.</p>
+      <div class="history">
+        <div class="history-head">
+          <h3 data-i18n="history.heading">Riwayat Cetak</h3>
+          <button type="button" id="clearHistoryBtn" class="btn btn-ghost btn-small" data-i18n="history.clear">Hapus</button>
+        </div>
+        <ul id="historyList" class="history-list"></ul>
+        <p class="hint" id="historyHint" data-i18n="history.hint">Riwayat hanya tersimpan di perangkat ini.</p>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="wrap">
+      <p class="disclaimer" data-i18n-html="footer.warning">
+        <strong>Perhatian:</strong> kartu yang dihasilkan adalah tiruan visual untuk keperluan
+        latihan atau pratinjau. Kartu ini <strong>tidak sah secara hukum</strong> dan tidak
+        diverifikasi oleh BPJS Kesehatan.
+      </p>
+      <p class="note" data-i18n="footer.note">
+        Tidak ada data yang dikirim ke server. Semua proses berjalan di peramban Anda.
+      </p>
+      <p class="footer-badge"><span class="badge-local" data-i18n="header.badge">100% di perangkat Anda</span></p>
+      <p class="watermark">
+        <span data-i18n="footer.made">Dibuat oleh</span>
+        <a href="https://github.com/helmiau" target="_blank" rel="noopener noreferrer">helmiau</a>
+        &middot;
+        <a href="https://github.com/helmiau/bpjs-kartu-gen" target="_blank" rel="noopener noreferrer" data-i18n="footer.source">kode sumber</a>
+        &middot;
+        <span class="app-version" id="appVersion">v1.7.3</span>
+      </p>
+    </div>
+  </footer>
+  <div class="toast" id="toast" role="status" aria-live="polite" hidden>
+    <span class="toast-icon" aria-hidden="true">✓</span>
+    <span class="toast-msg" id="toastMsg"></span>
+  </div>
+  <!-- Pustaka yang di-vendor; tidak ada pemuatan dari CDN saat runtime. -->
+  <script src="assets/vendor/JsBarcode.all.min.js?v=1.7.3"></script>
+  <script src="assets/vendor/jsQR.js?v=1.7.3"></script>
+  <script type="module" src="js/app.js?v=1.7.3"></script>
+</body>
+</html>
