@@ -4,6 +4,20 @@ All notable changes are recorded here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and versioning
 follows [SemVer](https://semver.org/).
 
+## [1.8.0] - 2026-11-15
+
+### Added
+- **About modal**: an info button in the header opens an "About" dialog with
+  the disclaimer, privacy note, version, a changelog button, and the source
+  link. The footer was removed; its content now lives in this dialog.
+
+### Changed
+- Header: the changelog button was replaced by the About button; the GitHub
+  link moved into the About dialog.
+- Mobile: the right-side header controls collapse into a menu (About, theme,
+  language).
+
+
 ## [1.7.9] - 2026-11-14
 
 ### Changed
