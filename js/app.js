@@ -648,14 +648,15 @@ async function handleBatchFiles(files) {
   let dataAdded = 0;
   let qrAdded = 0;
   let qrMiss = 0;
+  const missedFiles = [];
   try {
     for (let i = 0; i < list.length; i += 1) {
       const file = list[i];
-      setBatchStatus(`Memproses ${i + 1}/${list.length}: ${file.name}...`, 'busy');
+      setBatchStatus(`${t('batch.processing')} ${i + 1}/${list.length}: ${file.name}...`, 'busy');
       if (isImageFile(file)) {
         const found = [];
         await scanImageFile(file, (text) => found.push(text));
-        if (!found.length) { qrMiss += 1; continue; }
+        if (!found.length) { qrMiss += 1; missedFiles.push(file.name); continue; }
         const res = appendFromPayloads(found);
         qrAdded += res.added;
       } else {
@@ -666,15 +667,15 @@ async function handleBatchFiles(files) {
     }
     if (dataAdded || qrAdded) {
       const parts = [];
-      if (qrAdded) parts.push(`${qrAdded} dari QR`);
-      if (dataAdded) parts.push(`${dataAdded} dari tabel`);
-      if (qrMiss) parts.push(`${qrMiss} gambar tanpa QR`);
-      setBatchStatus(`Selesai: ${parts.join(', ')}.`, qrMiss ? 'error' : 'success');
+      if (qrAdded) parts.push(`${qrAdded} ${t('batch.fromQr')}`);
+      if (dataAdded) parts.push(`${dataAdded} ${t('batch.fromTable')}`);
+      if (qrMiss) parts.push(`${qrMiss} ${t('batch.noQr')}`);
+      setBatchStatus(`${t('batch.donePrefix')} ${parts.join(', ')}.`, qrMiss ? 'error' : 'success');
     } else if (qrMiss) {
-      setBatchStatus(`Tidak ada QR terbaca pada ${qrMiss} gambar.`, 'error');
+      setBatchStatus(`${t('batch.noQrFiles')}: ${missedFiles.join(', ')}`, 'error');
     }
   } catch (error) {
-    setBatchStatus(error.message || 'Gagal membaca berkas.', 'error');
+    setBatchStatus(error.message || t('batch.fileErr'), 'error');
   }
 }
 
