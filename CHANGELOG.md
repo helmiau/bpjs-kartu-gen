@@ -4,6 +4,18 @@ All notable changes are recorded here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and versioning
 follows [SemVer](https://semver.org/).
 
+## [1.8.2] - 2026-11-15
+
+### Added
+- **Paired PDF layout**: the PDF now defaults to one page with the front and
+  back cards side by side, each at physical card size (CR80, 85.6 x 54 mm),
+  matching a real card sheet. A "PDF layout" option lets you switch back to
+  one card per page.
+
+### Changed
+- Batch PDF: one page per participant (front + back pair) instead of two pages.
+
+
 ## [1.8.1] - 2026-11-15
 
 ### Fixed
