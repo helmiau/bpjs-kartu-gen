@@ -4,6 +4,15 @@ All notable changes are recorded here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and versioning
 follows [SemVer](https://semver.org/).
 
+## [1.7.8] - 2026-11-14
+
+### Fixed
+- **Changelog modal header**: the document title ("# Changelog") and the
+  opening Keep a Changelog/SemVer paragraph no longer appear in the modal;
+  rendering starts at the first version heading.
+- Service worker now always fetches `.md` files from the network, so the
+  changelog is never served stale from cache (cache bumped to v3).
+
 ## [1.7.7] - 2026-11-14
 
 ### Added
