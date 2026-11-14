@@ -1,111 +1,119 @@
 # Changelog
 
-Semua perubahan penting dicatat di sini. Format mengikuti
-[Keep a Changelog](https://keepachangelog.com/id/1.0.0/), versi mengikuti
-[SemVer](https://semver.org/lang/id/).
+All notable changes are recorded here. The format follows
+[Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and versioning
+follows [SemVer](https://semver.org/).
+
+## [1.7.7] - 2026-11-14
+
+### Added
+- **Changelog button in the header**: a document icon next to the brand
+  opens the same changelog modal as the footer version number.
+
+### Fixed
+- Header layout: the changelog icon aligns inline with the brand title.
 
 ## [1.7.6] - 2026-11-14
 
-### Diperbaiki
-- **Tab pratinjau di dark mode**: teks tab aktif memakai warna teks putih
-  di atas aksen hijau muda (kontras ~1,8, nyaris tak terbaca). Kini
-  memakai `--accent-text` (hijau gelap), kontras 7,73.
+### Fixed
+- **Preview tabs in dark mode**: the active tab text used near-white text on
+  a light-green accent (contrast ~1.8, nearly unreadable). Now uses
+  `--accent-text` (dark green), contrast 7.73.
 
 ## [1.7.5] - 2026-11-14
 
-### Diperbaiki
-- **CSS tidak termuat**: commit PWA (1.7.3) tak sengaja mengganti baris
-  `<link rel="stylesheet">` dengan manifest, sehingga halaman tampil tanpa
-  gaya. Link CSS dikembalikan.
-- Service worker: naikkan cache ke v2 + `skipWaiting` + `clients.claim`
-  agar peramban yang menyimpan HTML lama langsung mengambil versi baru.
+### Fixed
+- **Missing CSS**: the PWA commit (1.7.3) accidentally replaced the
+  `<link rel="stylesheet">` line with the manifest, so the live page rendered
+  unstyled. The CSS link is restored.
+- Service worker: bumped cache to v2 + `skipWaiting` + `clients.claim` so
+  browsers holding the stale HTML immediately fetch the new version.
 
 ## [1.7.4] - 2026-11-14
 
-### Ditambah
-- **Cetak A4 Duplex langsung**: tombol baru membuka dialog cetak peramban
-  tanpa perlu menyimpan PDF dulu.
-- **Persistensi lokal**: form single dan antrean batch tersimpan di
-  perangkat; tidak hilang saat peramban dimuat ulang.
-- **Progress ekspor batch**: bilah kemajuan + tombol **Batal** saat
-  membuat PDF massal.
-- **Tempel langsung ke dropzone**: paste gambar QR langsung dipindai;
-  paste teks langsung diproses sebagai TSV/CSV/base64.
-- **PWA offline**: aplikasi dapat dipasang dan dibuka tanpa jaringan
-  setelah pertama kali dimuat (manifest + service worker).
-- **Pemulihan QR**: nama berkas yang QR-nya gagal terbaca ditampilkan
-  secara eksplisit di status.
-- **Modal changelog**: tekan nomor versi di footer untuk melihat catatan
-  versi ini.
+### Added
+- **Direct A4 duplex print**: a new button opens the browser print dialog
+  without saving a PDF first.
+- **Local persistence**: the single form and batch queue are saved on the
+  device; they survive page reloads.
+- **Batch export progress**: a progress bar + **Cancel** button while building
+  the bulk PDF.
+- **Direct paste into the dropzone**: pasted QR images are scanned directly;
+  pasted text is processed as TSV/CSV/base64.
+- **Offline PWA**: installable and usable without network after first load
+  (manifest + service worker).
+- **QR recovery**: names of files whose QR failed to decode are shown
+  explicitly in the status.
+- **Changelog modal**: click the version number in the footer to read the
+  release notes.
 
-### Diperbaiki
-- Alamat 3 baris: font mengecil otomatis agar tidak terpotong dan tidak
-  menimpa baris di bawahnya (preview dan PDF konsisten).
-- Tombol "Bersihkan" kini jelas terlihat (outline merah + ikon), kontras
-  lulus AA pada tema terang dan gelap.
+### Fixed
+- Three-line address: the font shrinks automatically so it is not clipped and
+  does not overlap the row below (preview and PDF stay consistent).
+- The "Clear" buttons are now clearly visible (red outline + icon), with AA
+  contrast on both light and dark themes.
 
 ## [1.7.0] - 2026-11-13
 
-### Ditambah
-- **Layout Cetak A4 Bolak-Balik (Duplex)**: tiga mode (berdampingan,
-  vertikal, grid lembar penuh), crop marks, garis lipat, ekspor PDF A4
-  duplex, ekspor batch A4.
-- **Tab pratinjau**: Sisi Depan / Sisi Belakang / Simulasi A4 Duplex;
-  navigasi prev/next kartu untuk antrean batch.
-- **Watermark COPY** + **huruf kapital otomatis** pada nama (toggle di
-  Pengaturan Render & Visual).
-- **Toast notifikasi** mikro; **label eksplisit** digit (13/16) pada
-  kolom form.
-- **Batch**: tab Impor file / Tempel teks dengan auto-detect per baris
-  (TSV/CSV atau base64).
+### Added
+- **A4 duplex print layout**: three modes (side-by-side, vertical, full-sheet
+  grid), crop marks, fold line, A4 duplex PDF export, batch A4 export.
+- **Preview tabs**: Front side / Back side / A4 duplex simulation; prev/next
+  card navigation for the batch queue.
+- **COPY watermark** + **automatic uppercase** on names (toggle in Render &
+  Visual Settings).
+- Micro **toast notifications**; explicit digit **labels** (13/16) on form
+  fields.
+- **Batch**: Import file / Paste text tabs with per-line auto-detection
+  (TSV/CSV or base64).
 
 ## [1.6.0] - 2026-11-12
 
-### Ditambah
-- Pengaturan Render & Visual sebagai panel berdiri sendiri (fotokopi
-  hitam-putih, PDF raster, watermark, auto-kapital).
-- Terjemahan antarmuka Indonesia/Inggris dengan tombol ganti bahasa.
-- Template unduhan CSV/TSV/XLSX; tambah dari kode base64 atau gambar QR
-  berulang.
+### Added
+- Render & Visual Settings as a standalone panel (black-and-white copy, raster
+  PDF, watermark, auto-uppercase).
+- Indonesian/English UI translation with a language toggle.
+- Downloadable CSV/TSV/XLSX templates; repeated add from base64 code or QR
+  images.
 
 ## [1.5.0] - 2026-11-12
 
-### Ditambah
-- Pemrosesan batch: impor CSV/TSV/XLSX, tabel antrean, pilih/hapus,
-  ekspor PDF massal, pratinjau dua tumpuk.
-- Rombak UI mengikuti desain (dua kolom, panel bisa dilipat).
+### Added
+- Batch processing: import CSV/TSV/XLSX, queue table, select/remove, bulk PDF
+  export, two-panel preview.
+- UI rework following the design (two columns, collapsible panels).
 
 ## [1.4.0] - 2026-11-11
 
-### Ditambah
-- Ekspor 300 dpi; PDF teks vektor yang bisa diedit.
-- Nama berkas ekspor terstandar: `KARTU_<nomor>-BPJS[_DEPAN|_BELAKANG].<ext>`.
-- Toggle ekspor fotokopi hitam-putih & PDF raster.
-- Logo & ikon web diganti logo BPJS Kesehatan.
+### Added
+- 300 dpi export; editable vector-text PDF.
+- Standardized export filename: `KARTU_<number>-BPJS[_FRONT|_BACK].<ext>`.
+- Export toggles: black-and-white copy & raster PDF.
+- Web logo & icon replaced with the BPJS Kesehatan logo.
 
 ## [1.3.0] - 2026-11-10
 
-### Ditambah
-- Versi web ditampil di footer; cache-bust aset.
-- Tema gelap dengan saklar header, tersimpan di perangkat.
-- Redesain UI satu kolom kartu-di-atas, satu aksi primer, validasi
-  tertunda.
+### Added
+- Web version shown in the footer; asset cache-busting.
+- Dark theme with a header switch, saved on the device.
+- UI redesign: single card-on-top column, one primary action, deferred
+  validation.
 
 ## [1.2.0] - 2026-11-09
 
-### Ditambah
-- Upgrade kedua sisi template ke resolusi tinggi.
-- Pindai QR dari gambar / kamera; isi form dari kode base64.
+### Added
+- Both template sides upgraded to high resolution.
+- QR scan from image / camera; fill the form from a base64 code.
 
 ## [1.1.0] - 2026-11-08
 
-### Ditambah
-- Render kartu dua sisi sesuai tata letak resmi (label, titik dua,
-  nilai, barcode Code 128).
-- Ekspor sisi tunggal JPG / PDF.
+### Added
+- Two-side card rendering matching the official layout (labels, colon, values,
+  Code 128 barcode).
+- Single-side JPG / PDF export.
 
 ## [1.0.0] - 2026-11-08
 
-### Ditambah
-- Rilis pertama: form data peserta, pratinjau kartu, ekspor JPG/PDF.
-  Semua proses berjalan di peramban, tanpa server.
+### Added
+- First release: participant form, card preview, JPG/PDF export.
+  Everything runs in the browser, no server.

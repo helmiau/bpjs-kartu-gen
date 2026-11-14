@@ -1,8 +1,8 @@
 # DESIGN.md — Generator Kartu BPJS
 
-> Status: **observed** — arah ini dibangun dari kode yang ada (PRD.md, index.html,
+> Status: **observed** — arah ini dibangun dari kode yang ada (AGENTS.md, index.html,
 > assets/css/style.css) dan disahkan pengguna pada 2026-11-11.
-> Sumber: PRD.md (tujuan & alur), render baseline 2026-11-11 (temuan),
+> Sumber: AGENTS.md (tujuan & alur), render baseline 2026-11-11 (temuan),
 > pemilihan arah visual oleh pengguna (3 alternatif disajikan).
 
 ## Arah visual: "Desa & Dokumen"
@@ -77,9 +77,9 @@ agar kontras AA pada permukaan gelap (mis. aksen `#4cc38a` vs `#17201b`).
      → diterima; label tombol eksplisit
    - Tes: satu elemen `btn-primary` per layar (diukur di render)
 4. **Jalur cepat base64 di atas form manual**
-   - Keputusan: P0 PRD (G1) = isi dari kode; diletakkan di puncak form,
-     tombol QR menyusut menjadi dua ghost kecil
-   - Bukti: prioritas P0 di PRD §13; pengguna utama (operator) punya payload
+   - Keputusan: prioritas utama (isi dari kode) = jalur cepat; diletakkan di
+     puncak form, tombol QR menyusut menjadi dua ghost kecil
+   - Bukti: tujuan produk di AGENTS.md; pengguna utama (operator) punya payload
      dari aplikasi lain
    - Trade-off: pengguna input manual scrolling lebih dulu → diterima
      (jalur cepat hanya 2 baris)

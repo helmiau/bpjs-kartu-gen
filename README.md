@@ -1,141 +1,159 @@
-# Generator Kartu BPJS
+# BPJS Card Generator
 
-Aplikasi web satu-halaman untuk membuat kartu peserta BPJS Kesehatan
-(Kartu Indonesia Sehat) langsung di perangkat. Tidak ada server, tidak ada
-pengiriman data — semua proses berjalan di peramban.
+A single-page web app that builds BPJS Kesehatan participant cards
+(Kartu Indonesia Sehat) directly on your device. No server, no data upload:
+everything runs in the browser.
 
-> **Perhatian:** kartu yang dihasilkan adalah tiruan visual untuk latihan atau
-> pratinjau. Kartu ini **tidak sah secara hukum** dan tidak diverifikasi oleh
-> BPJS Kesehatan.
+> **Warning:** generated cards are visual replicas for practice or preview.
+> They are **not legally valid** and are not verified by BPJS Kesehatan.
 
-## Fitur
+## Features
 
-- **Tiga jalur pengisian data**
-  - Tempel string base64 secara manual
-  - Pindai kode QR dari berkas gambar
-  - Pindai kode QR dari kamera perangkat
-  - Buka halaman dengan `?data=<base64>` untuk pengisian otomatis
-- **Form manual** 8 kolom peserta dengan validasi
-- **Pratinjau kartu** sisi depan dan sisi belakang
-- **Ekspor** JPG per sisi dan PDF gabungan (ukuran fisik 85,6 mm), 300 dpi
-  - **Fotokopi hitam-putih**: JPG & PDF dicetak monokrom (grayscale)
-  - **PDF raster**: teks dibakar ke gambar (tidak bisa diedit); default PDF
-    menyimpan teks vektor yang bisa diseleksi/diedit
-- **Riwayat cetak lokal** (localStorage), bisa dihapus
+- **Three data-entry paths**
+  - Paste a base64 string manually
+  - Scan a QR code from an image file
+  - Scan a QR code with the device camera
+  - Open the page with `?data=<base64>` to auto-fill
+- **Manual form** with 8 participant fields and validation
+- **Card preview** for front and back sides
+- **Export** per-side JPG and a combined PDF (physical 85.6 mm size), 300 dpi
+  - **Black-and-white copy**: JPG & PDF rendered monochrome (grayscale)
+  - **Raster PDF**: text burned into the image (not editable); the default
+    PDF keeps vector text that can be selected/edited
+- **Local print history** (localStorage), clearable
+- **Batch mode**: import CSV/TSV/XLSX or QR images, a queue table with
+  select/remove, batch PDF export with progress bar and cancel button
+- **A4 duplex layout**: side-by-side, vertical, or full-sheet grid; crop
+  marks and fold line; save or print the A4 duplex PDF
+- **Batch source tabs**: "Import file" and "Paste text" with per-line
+  auto-detection (TSV/CSV or base64)
+- **Direct print**: open the browser print dialog for the A4 duplex sheet
+- **Local persistence**: the single form and batch queue survive reloads
+- **Offline PWA**: installable, works without network after first load
+- **Changelog modal**: click the version number (or the header icon) to read
+  `CHANGELOG.md`
 
-Kartu sisi depan memuat **barcode Code 128** berisi 13 digit nomor kartu
-(seperti kartu resmi BPJS), opsional lewat kotak centang, default aktif.
-Kode QR sengaja tidak dipakai di kartu: QR yang memuat base64 JSON lengkap
-(~324 karakter) butuh 65 modul dan blok ±260 piksel agar bisa dipindai
-balik — menutupi hampir seluruh teks kartu. Data tetap masuk lewat jalur
-tempel, gambar, kamera, atau URL; `jsQR` dipakai untuk membacanya.
+The front side carries a **Code 128 barcode** with the 13-digit card number
+(like the official BPJS card), optional via a checkbox, enabled by default.
+QR codes are deliberately not used on the card: a QR holding the full base64
+JSON (~324 characters) needs 65 modules and a ~260-pixel block to scan back,
+covering nearly all card text. Data still enters via paste, image, camera, or
+URL; `jsQR` is used to read it.
 
-## Cara pakai
+## Usage
 
-Buka `index.html` lewat server statis apa pun:
+Open `index.html` through any static server:
 
 ```bash
 npx http-server . -p 8080 -c-1
-# lalu buka http://127.0.0.1:8080/
+# then open http://127.0.0.1:8080/
 ```
 
-Atau langsung buka berkas `index.html` di peramban (pemindaian kamera
-memerlukan HTTPS atau `localhost`).
+Or open `index.html` directly in the browser (camera scanning requires HTTPS
+or `localhost`).
 
-Contoh pengisian dari URL:
+Example URL fill:
 
 ```
 http://127.0.0.1:8080/?data=eyJub21vckthcnR1IjoiMDAwMDAwMDAwMDAwMCIs...
 ```
 
-## Struktur berkas
+## File structure
 
 ```
-index.html              halaman utama
-404.html                halaman tidak ditemukan
-.nojekyll               mencegah pemrosesan Jekyll di GitHub Pages
+index.html              main page
+404.html                not-found page
+manifest.json           PWA manifest
+sw.js                   service worker (offline cache)
+CHANGELOG.md            version history
+AGENTS.md               agent/dev operating manual
+.nojekyll               disable Jekyll processing on GitHub Pages
 assets/
-  css/style.css         gaya antarmuka (lihat DESIGN.md)
-  img/                  template kartu depan & belakang (PNG) + logo
-                        BPJS (bpjs-logo.svg, bpjs-mark.svg, icon favicon)
+  css/style.css         UI styles
+  img/                  card templates (PNG) + BPJS logo & icons
 js/
-  app.js                orkestrasi: form, tombol, URL, riwayat
-  card.js               render kartu dua sisi
-  scanner.js            pemindai QR dari gambar & kamera
-  exporter.js           ekspor JPG dan perakitan PDF
-  pdf-text.js           lapisan teks vektor PDF (label/nilai bisa diedit)
-  payload.js            base64 <-> JSON (tahan variasi nama kunci)
-  date.js               konversi tanggal DD-MM-YYYY <-> YYYY-MM-DD
-  validate.js           validasi kolom form
-  pdf-size.js           ukuran halaman PDF + skala 300 dpi
-  schema.js             tata letak kartu (koordinat piksel)
-  version.js            versi aplikasi (sumber tunggal untuk UI + cache-bust)
-  history.js            riwayat localStorage
+  app.js                orchestration: form, buttons, URL, history, batch
+  card.js               two-side card rendering
+  a4.js, a4-constants.js  A4 duplex sheet composition
+  scanner.js            QR scanner from image & camera
+  exporter.js           JPG export, PDF assembly, batch, A4
+  pdf-text.js           PDF vector text layer (editable labels/values)
+  payload.js            base64 <-> JSON (tolerant of key variants)
+  date.js               date conversion DD-MM-YYYY <-> YYYY-MM-DD
+  validate.js           form field validation
+  pdf-size.js           PDF page size + 300 dpi scale
+  schema.js             card layout (pixel coordinates)
+  batch.js              CSV/TSV/XLSX parsing, mapping, validation, classifier
+  templates.js          downloadable CSV/TSV/XLSX templates
+  i18n.js               Indonesian/English UI strings
+  version.js            app version (single source for UI + cache-bust)
+  history.js            localStorage print history
+test/                   Vitest unit tests
 ```
 
-## Pengujian
+## Testing
 
 ```bash
 npm install
 npm test
 ```
 
-65 unit test mencakup konversi base64, tahan variasi nama kunci, konversi
-tanggal, validasi kolom, skala DPI, dan tata letak teks PDF.
+98 unit tests cover base64 conversion, key-variant tolerance, date conversion,
+field validation, DPI scaling, PDF text layout, batch parsing, classifier,
+filename sanitization, and font shrink-to-fit.
 
-## Deploy ke GitHub Pages
+## Deploy to GitHub Pages
 
-1. Dorong repo ini ke GitHub.
-2. Buka **Settings → Pages**.
-3. Pilih **Source: Deploy from a branch**, cabang `master`, folder `/ (root)`.
-4. Tunggu beberapa saat, lalu buka `https://<user>.github.io/<repo>/`.
+1. Push this repo to GitHub.
+2. Open **Settings → Pages**.
+3. Choose **Source: Deploy from a branch**, branch `main`, folder `/ (root)`.
+4. Wait a moment, then open `https://<user>.github.io/<repo>/`.
 
-Tidak ada langkah build. Pustaka sudah di-*vendor*, sehingga halaman tidak
-memuat skrip dari CDN pihak ketiga saat runtime.
+There is no build step. Libraries are vendored, so the page loads no scripts
+from third-party CDNs at runtime.
 
-## Versi web
+## Web version
 
-Nomor versi tampil di footer (`v1.1.0`) dan dicatat di konsol peramban. Sumber
-tunggalnya `js/version.js` (`APP_VERSION`) dan `package.json`. Untuk merilis
-versi baru:
+The version number shows in the footer (`v1.7.7`) and is logged to the browser
+console. The single source is `js/version.js` (`APP_VERSION`) and
+`package.json`. To release a new version:
 
-1. Naikkan `APP_VERSION` di `js/version.js` dan `version` di `package.json`.
-2. Samakan query `?v=` pada `assets/css/style.css`, pustaka `assets/vendor/*`,
-   dan `js/app.js` di `index.html` serta `404.html` dengan nomor baru.
-3. Dorong; peramban akan mengambil aset baru karena URL-nya berubah.
+1. Bump `APP_VERSION` in `js/version.js` and `version` in `package.json`.
+2. Match the `?v=` query on `assets/css/style.css`, the `assets/vendor/*`
+   libraries, and `js/app.js` in `index.html` to the new number.
+3. Push; the browser fetches fresh assets because their URLs changed.
 
-Query `?v=` pada aset membuat cache peramban (GitHub Pages/`max-age=600`) tidak
-menyajikan berkas lama setelah rilis.
+The `?v=` query on assets keeps the browser cache (GitHub Pages/`max-age=600`)
+from serving stale files after a release. The service worker cache name
+(`CACHE_NAME` in `sw.js`) should also be bumped on breaking changes.
 
-## Catatan teknis
+## Technical notes
 
-- **Tanpa backend.** Tidak ada `fetch` ke luar; satu-satunya permintaan adalah
-  aset dari repo itu sendiri.
-- **Aman terhadap XSS.** Semua nilai dimasukkan lewat `textContent`, tidak
-  pernah `innerHTML`.
-- **Barcode Code 128, bukan QR.** Situs sumber memakai Code 39 hasil PHP
-  (`dynamic_barcode.php`) yang mati di GitHub Pages. QR berisi base64 JSON
-  lengkap diukur butuh blok ±260 piksel agar bisa dipindai balik —
-  menutupi hampir seluruh teks kartu. Karena itu kartu memakai Code 128 berisi
-  nomor kartu (dibangkitkan `JsBarcode`, opsional, default aktif), dan `jsQR`
-  dipakai untuk membaca QR dari berkas gambar atau kamera.
-- **Ukuran kartu 350 × 222 piksel**, rasio 1,579 mengikuti kartu resmi BPJS
-  (473,8 × 300 pt). Ekspor (JPG & PDF) dihitung agar raster keluar **tepat
-  300 dpi** saat dicetak seukuran kartu (sisi terpanjang 85,6 mm), sekitar
-  1011 × 641 piksel, dengan batas 36 juta piksel agar peramban ponsel tidak
-  kehabisan memori. Lihat `pdf-size.js` (`exportScaleForDpi`).
-- **PDF berlapis dua: latar raster + teks vektor.** Latar (template + barcode)
-  digambar sebagai gambar 300 dpi, lalu label dan nilai peserta ditulis
-  sebagai objek teks vektor memakai font standar Helvetica (tanpa berkas font
-  tertanam). Hasilnya teks kartu **bisa diseleksi dan diedit** di pembaca PDF.
-  Lihat `pdf-text.js`.
-- **Latar digambar langsung, bukan html2canvas.** Template asli (1516 × 960 px
-  per sisi, tanpa metadata DPI) digambar ke kanvas 300 dpi dengan penskalaan
-  halus peramban, lalu barcode SVG diraster pada ukuran penuh. html2canvas
-  dahulu menurunkan latar ke 350 px lalu memperbesarnya, sehingga teks syarat
-  jadi buram; jalur langsung ini menjaga ketajaman. Teks peserta tidak ikut di
-  dalam PNG, sehingga tidak ada teks ganda.
-- **Logo BPJS.** `assets/img/bpjs-logo.svg` (lockup) dan `bpjs-mark.svg`
-  (tanda kotak untuk favicon/header) berasal dari Wikimedia Commons (logo
-  BPJS Kesehatan). Logo adalah merek dagang BPJS Kesehatan; dipakai di sini
-  hanya untuk konteks alat tiruan/pratinjau, bukan klaim afiliasi.
+- **No backend.** No outbound `fetch`; the only requests are assets from the
+  repo itself.
+- **XSS-safe.** All values go through `textContent`, never `innerHTML`.
+- **Code 128 barcode, not QR.** The source site used a PHP-generated Code 39
+  (`dynamic_barcode.php`) that dies on GitHub Pages. A QR holding the full
+  base64 JSON needs a ~260-pixel block to scan back, covering almost all card
+  text. So the card uses Code 128 with the card number (generated by
+  `JsBarcode`, optional, default on), and `jsQR` reads QR from image or camera.
+- **Card size 350 × 222 pixels**, ratio 1.579 following the official BPJS card
+  (473.8 × 300 pt). Export (JPG & PDF) is computed so the raster comes out at
+  **exactly 300 dpi** when printed at card size (longest side 85.6 mm), about
+  1011 × 641 pixels, capped at 36 megapixels so mobile browsers do not run out
+  of memory. See `pdf-size.js` (`exportScaleForDpi`).
+- **Two-layer PDF: raster background + vector text.** The background (template
+  + barcode) is drawn as a 300 dpi image, then labels and participant values
+  are written as vector text objects using the standard Helvetica font (no
+  embedded font file). Card text is therefore **selectable and editable** in a
+  PDF reader. See `pdf-text.js`.
+- **Background drawn directly, not html2canvas.** The original template
+  (1516 × 960 px per side, no DPI metadata) is drawn to a 300 dpi canvas with
+  the browser's smooth scaling, then the SVG barcode is rasterized at full
+  size. html2canvas previously downscaled the background to 350 px and then
+  upscaled it, blurring the terms text; the direct path keeps it sharp.
+  Participant text is not part of the PNG, so there is no double text.
+- **BPJS logo.** `assets/img/bpjs-logo.svg` (lockup) and `bpjs-mark.svg`
+  (square mark for favicon/header) come from Wikimedia Commons (BPJS
+  Kesehatan logo). The logo is a BPJS Kesehatan trademark; it is used here only
+  for the context of a replica/preview tool, not as a claim of affiliation.

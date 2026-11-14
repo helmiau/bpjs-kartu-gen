@@ -461,9 +461,9 @@ function bind() {
 /* ---------------- Modal catatan versi ---------------- */
 async function bindChangelog() {
   const modal = document.getElementById('changelogModal');
-  const btn = document.getElementById('appVersion');
+  const versionBtn = document.getElementById('appVersion');
   const body = document.getElementById('changelogBody');
-  if (!modal || !btn) return;
+  if (!modal || !versionBtn) return;
   let loaded = null;
 
   function renderMarkdown(src) {
@@ -511,7 +511,8 @@ async function bindChangelog() {
     document.body.style.overflow = '';
   }
 
-  btn.addEventListener('click', openModal);
+  versionBtn.addEventListener('click', openModal);
+  document.getElementById('changelogBtn')?.addEventListener('click', openModal);
   modal.querySelectorAll('[data-close-changelog]').forEach((el) => el.addEventListener('click', closeModal));
   document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && !modal.hidden) closeModal(); });
 }
