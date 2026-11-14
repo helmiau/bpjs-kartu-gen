@@ -4,6 +4,13 @@ Semua perubahan penting dicatat di sini. Format mengikuti
 [Keep a Changelog](https://keepachangelog.com/id/1.0.0/), versi mengikuti
 [SemVer](https://semver.org/lang/id/).
 
+## [1.7.6] - 2026-11-14
+
+### Diperbaiki
+- **Tab pratinjau di dark mode**: teks tab aktif memakai warna teks putih
+  di atas aksen hijau muda (kontras ~1,8, nyaris tak terbaca). Kini
+  memakai `--accent-text` (hijau gelap), kontras 7,73.
+
 ## [1.7.5] - 2026-11-14
 
 ### Diperbaiki
