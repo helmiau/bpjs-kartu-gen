@@ -1,0 +1,13 @@
+{
+  "name": "Generator Kartu BPJS",
+  "short_name": "Kartu BPJS",
+  "description": "Generator kartu BPJS Kesehatan dua sisi (JPG/PDF) dari data peserta.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#0d9488",
+  "icons": [
+    { "src": "assets/img/bpjs-icon-180.png", "sizes": "180x180", "type": "image/png", "purpose": "any" },
+    { "src": "assets/img/bpjs-icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" }
+  ]
+}
