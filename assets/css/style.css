@@ -543,7 +543,7 @@ textarea { resize: vertical; }
 .preview-tab:hover { background: var(--surface-container); color: var(--text); }
 .preview-tab.is-active {
   background: var(--accent);
-  color: var(--text);
+  color: var(--accent-text);
   border-color: var(--accent);
 }
 /* Toolbar navigasi kartu. */
