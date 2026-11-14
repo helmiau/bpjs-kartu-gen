@@ -453,8 +453,67 @@ function bind() {
   document.getElementById('autoCapsToggle')?.addEventListener('change', refresh);
   document.getElementById('themeToggle')?.addEventListener('click', toggleTheme);
   bindBatch();
+  bindChangelog();
   bindLangButtons();
   bindCollapse();
+}
+
+/* ---------------- Modal catatan versi ---------------- */
+async function bindChangelog() {
+  const modal = document.getElementById('changelogModal');
+  const btn = document.getElementById('appVersion');
+  const body = document.getElementById('changelogBody');
+  if (!modal || !btn) return;
+  let loaded = null;
+
+  function renderMarkdown(src) {
+    // Parser markdown minimalis untuk CHANGELOG: # h2, ## versi, ### seksi, - list, teks biasa.
+    const lines = src.split(/\r?\n/);
+    const out = [];
+    let inList = false;
+    for (const line of lines) {
+      const h2 = /^##\s+(.+)$/.exec(line);
+      const h3 = /^###\s+(.+)$/.exec(line);
+      const li = /^-\s+(.+)$/.exec(line);
+      if (h2) { if (inList) { out.push('</ul>'); inList = false; } out.push(`<h3>${escapeHtml(h2[1])}</h3>`); }
+      else if (h3) { if (inList) { out.push('</ul>'); inList = false; } out.push(`<h3 style="margin-top:.5em">${escapeHtml(h3[1])}</h3>`); }
+      else if (li) { if (!inList) { out.push('<ul>'); inList = true; } out.push(`<li>${mdInline(li[1])}</li>`); }
+      else if (line.trim()) { if (inList) { out.push('</ul>'); inList = false; } out.push(`<p>${mdInline(line.trim())}</p>`); }
+      else { if (inList) { out.push('</ul>'); inList = false; } }
+    }
+    if (inList) out.push('</ul>');
+    return out.join('');
+  }
+  function mdInline(text) {
+    return escapeHtml(text).replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>');
+  }
+
+  async function openModal() {
+    if (body) {
+      if (loaded === null) {
+        body.innerHTML = `<p>${escapeHtml(t('changelog.loading'))}</p>`;
+        try {
+          const res = await fetch('CHANGELOG.md', { cache: 'no-store' });
+          loaded = await res.text();
+        } catch {
+          loaded = t('changelog.err');
+        }
+        body.innerHTML = loaded.startsWith(t('changelog.err')) ? `<p>${escapeHtml(loaded)}</p>` : renderMarkdown(loaded);
+      }
+    }
+    modal.hidden = false;
+    document.body.style.overflow = 'hidden';
+    const closeBtn = modal.querySelector('[data-close-changelog]');
+    if (closeBtn) closeBtn.focus();
+  }
+  function closeModal() {
+    modal.hidden = true;
+    document.body.style.overflow = '';
+  }
+
+  btn.addEventListener('click', openModal);
+  modal.querySelectorAll('[data-close-changelog]').forEach((el) => el.addEventListener('click', closeModal));
+  document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && !modal.hidden) closeModal(); });
 }
 /* ---------------- Batch processing ---------------- */
 /** Antrean peserta: [{ peseta, ok, errors, selected }]. */
