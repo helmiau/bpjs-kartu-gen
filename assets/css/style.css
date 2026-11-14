@@ -169,14 +169,14 @@ body {
 }
 
 /* Tombol menu (hamburger) header: hanya tampil di mobile. */
-.header-menu-btn { display: none; }
+.header-menu-btn.header-menu-btn { display: none; }
 .header-menu {
   position: absolute;
   top: calc(100% + 6px);
   right: var(--space-4);
-  min-width: 210px;
+  min-width: 220px;
   z-index: 200;
-  display: flex;
+  display: none;
   flex-direction: column;
   gap: 2px;
   padding: var(--space-2);
@@ -185,10 +185,11 @@ body {
   border-radius: var(--radius-sm);
   box-shadow: var(--shadow-lg, 0 12px 40px rgba(0, 0, 0, .3));
 }
-.header-menu[hidden] { display: none; }
+.header-menu:not([hidden]) { display: flex; }
 .header-menu-item {
   display: flex;
   align-items: center;
+  gap: 10px;
   width: 100%;
   min-height: 40px;
   padding: 8px 12px;
@@ -202,6 +203,7 @@ body {
   text-decoration: none;
   cursor: pointer;
 }
+.header-menu-item svg { width: 18px; height: 18px; flex: none; color: var(--text-muted); }
 .header-menu-item:hover { background: var(--surface-container); }
 .header-menu-lang {
   display: inline-flex;
@@ -227,7 +229,7 @@ body {
 .header-menu-lang .lang-btn[aria-pressed="true"] { background: var(--surface); color: var(--accent); box-shadow: var(--shadow); }
 @media (max-width: 640px) {
   .header-actions { display: none; }
-  .header-menu-btn { display: inline-flex; }
+  .header-menu-btn.header-menu-btn { display: inline-flex; }
   .site-header { position: relative; }
 }
 .lang-switch {

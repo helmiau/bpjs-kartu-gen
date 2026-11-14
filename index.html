@@ -9,7 +9,7 @@
   <link rel="icon" type="image/svg+xml" href="assets/img/bpjs-mark.svg">
   <link rel="icon" type="image/png" sizes="512x512" href="assets/img/bpjs-icon-512.png">
   <link rel="apple-touch-icon" href="assets/img/bpjs-icon-180.png">
-  <link rel="stylesheet" href="assets/css/style.css?v=1.8.0">
+  <link rel="stylesheet" href="assets/css/style.css?v=1.8.1">
   <link rel="manifest" href="manifest.json">
   <meta name="theme-color" content="#0d9488">
   <script>
@@ -36,14 +36,6 @@
         </div>
       </div>
       <div class="header-actions">
-        <button type="button" class="icon-btn about-btn" id="aboutBtn"
-          aria-label="Tentang aplikasi" title="Tentang aplikasi" data-i18n-aria="about.btnAria" data-i18n-title="about.btnTitle">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-            <circle cx="12" cy="12" r="9"></circle>
-            <line x1="12" y1="11" x2="12" y2="16"></line>
-            <line x1="12" y1="8" x2="12" y2="8.01"></line>
-          </svg>
-        </button>
         <div class="lang-switch" role="group" aria-label="Pilihan bahasa" data-i18n-aria="header.lang">
           <button type="button" id="langIdBtn" class="lang-btn" aria-pressed="true">ID</button>
           <button type="button" id="langEnBtn" class="lang-btn" aria-pressed="false">EN</button>
@@ -60,6 +52,14 @@
             <path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"></path>
           </svg>
         </button>
+        <button type="button" class="icon-btn about-btn" id="aboutBtn"
+          aria-label="Tentang aplikasi" title="Tentang aplikasi" data-i18n-aria="about.btnAria" data-i18n-title="about.btnTitle">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <circle cx="12" cy="12" r="9"></circle>
+            <line x1="12" y1="11" x2="12" y2="16"></line>
+            <line x1="12" y1="8" x2="12" y2="8.01"></line>
+          </svg>
+        </button>
       </div>
       <button type="button" class="icon-btn header-menu-btn" id="headerMenuBtn"
         aria-label="Menu" aria-expanded="false" aria-controls="headerMenu" data-i18n-aria="header.menuAria">
@@ -70,12 +70,18 @@
         </svg>
       </button>
       <div class="header-menu" id="headerMenu" hidden>
-        <button type="button" class="header-menu-item" data-menu-action="about" data-i18n="about.title">Tentang Aplikasi</button>
-        <button type="button" class="header-menu-item" data-menu-action="theme" data-i18n="header.themeTitle">Ganti tema</button>
         <div class="header-menu-lang" role="group" aria-label="Pilihan bahasa" data-i18n-aria="header.lang">
           <button type="button" id="langIdBtnMobile" class="lang-btn" aria-pressed="true">ID</button>
           <button type="button" id="langEnBtnMobile" class="lang-btn" aria-pressed="false">EN</button>
         </div>
+        <button type="button" class="header-menu-item" data-menu-action="theme">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"></path></svg>
+          <span data-i18n="header.themeTitle">Ganti tema</span>
+        </button>
+        <button type="button" class="header-menu-item" data-menu-action="about">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"></circle><line x1="12" y1="11" x2="12" y2="16"></line><line x1="12" y1="8" x2="12" y2="8.01"></line></svg>
+          <span data-i18n="about.title">Tentang Aplikasi</span>
+        </button>
       </div>
     </div>
   </header>
@@ -490,9 +496,9 @@
     <span class="toast-msg" id="toastMsg"></span>
   </div>
   <!-- Pustaka yang di-vendor; tidak ada pemuatan dari CDN saat runtime. -->
-  <script src="assets/vendor/JsBarcode.all.min.js?v=1.8.0"></script>
-  <script src="assets/vendor/jsQR.js?v=1.8.0"></script>
-  <script type="module" src="js/app.js?v=1.8.0"></script>
+  <script src="assets/vendor/JsBarcode.all.min.js?v=1.8.1"></script>
+  <script src="assets/vendor/jsQR.js?v=1.8.1"></script>
+  <script type="module" src="js/app.js?v=1.8.1"></script>
   <script>
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', function () {
