@@ -399,6 +399,34 @@ function bind() {
       if (btn) btn.disabled = false;
     }
   });
+  document.getElementById('a4PrintNowBtn')?.addEventListener('click', async () => {
+    const form = readForm();
+    if (!validate(form).ok) { markTouched(); return; }
+    const status = document.getElementById('a4Status');
+    const btn = document.getElementById('a4PrintNowBtn');
+    if (btn) btn.disabled = true;
+    if (status) { status.textContent = t('a4.printing'); status.dataset.kind = 'busy'; }
+    try {
+      const opts = { mode: a4Mode(), crop: isA4Crop(), fold: isA4Fold(), grayscale: !!document.getElementById('photoCopyToggle')?.checked, watermark: copyMarkEnabled() };
+      const { blob } = await exportA4Pdf(form, opts);
+      const url = URL.createObjectURL(blob);
+      const frame = document.createElement('iframe');
+      frame.style.position = 'fixed';
+      frame.style.right = '100%';
+      frame.style.width = '0';
+      frame.style.height = '0';
+      frame.style.border = '0';
+      frame.src = url;
+      document.body.appendChild(frame);
+      frame.onload = () => {
+        frame.contentWindow.focus();
+        frame.contentWindow.print();
+        setTimeout(() => { URL.revokeObjectURL(url); frame.remove(); if (btn) btn.disabled = false; if (status) { status.textContent = t('a4.printed'); status.dataset.kind = 'success'; } }, 2000);
+      };
+    } catch (error) {
+      if (status) { status.textContent = error.message || t('a4.printErr'); status.dataset.kind = 'error'; if (btn) btn.disabled = false; }
+    }
+  });
 
   // Tab pratinjau + navigasi kartu.
   document.getElementById('previewTabFront')?.addEventListener('click', () => setPreviewTab('front'));
