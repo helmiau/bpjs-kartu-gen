@@ -4,6 +4,18 @@ All notable changes are recorded here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and versioning
 follows [SemVer](https://semver.org/).
 
+## [1.8.1] - 2026-11-15
+
+### Fixed
+- **Mobile header menu leaking into desktop**: the hamburger button was hidden
+  on desktop again (it was being overridden by the generic icon-button rule),
+  and the dropdown stays closed until opened.
+
+### Changed
+- Header order on desktop and in the mobile menu: language switch, theme,
+  About. Each mobile menu item now carries an icon.
+
+
 ## [1.8.0] - 2026-11-15
 
 ### Added
