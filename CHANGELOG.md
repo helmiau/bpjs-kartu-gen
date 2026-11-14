@@ -4,6 +4,12 @@ All notable changes are recorded here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and versioning
 follows [SemVer](https://semver.org/).
 
+## [1.7.9] - 2026-11-14
+
+### Changed
+- Changelog button moved from the left (brand area) to the right side of the
+  header, grouped with the language/theme/GitHub controls.
+
 ## [1.7.8] - 2026-11-14
 
 ### Fixed
