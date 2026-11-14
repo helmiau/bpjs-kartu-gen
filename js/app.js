@@ -99,9 +99,11 @@ function copyMarkEnabled() {
 function exportOptions() {
   const photo = document.getElementById('photoCopyToggle');
   const raster = document.getElementById('rasterPdfToggle');
+  const layoutEl = document.querySelector('input[name="pdfLayout"]:checked');
   return {
     grayscale: photo ? photo.checked : false,
     raster: raster ? raster.checked : false,
+    pair: layoutEl ? layoutEl.value === 'pair' : true,
     watermark: copyMarkEnabled()
   };
 }

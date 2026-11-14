@@ -8,6 +8,13 @@
 
 const LONG_EDGE_MM = 85.6;
 
+/** Ukuran kartu fisik CR80 (ISO/IEC 7810 ID-1). */
+export const CR80_MM = { width: 85.6, height: 53.98 };
+
+/** Celah antar dua kartu dan margin tepi pada lembar pasangan (mm). */
+export const PAIR_GAP_MM = 3;
+export const PAIR_MARGIN_MM = 2;
+
 export function pdfPageSizeMm(width, height) {
   const w = Number(width);
   const h = Number(height);
@@ -18,6 +25,37 @@ export function pdfPageSizeMm(width, height) {
     return [LONG_EDGE_MM, (LONG_EDGE_MM * h) / w];
   }
   return [(LONG_EDGE_MM * w) / h, LONG_EDGE_MM];
+}
+
+/**
+ * Ukuran (mm) satu kartu mengikuti rasio kanvas dengan sisi terpanjang CR80.
+ * Tinggi = CR80.width * (canvasH / canvasW), jadi rasio kanvas terjaga.
+ */
+export function cardSizeMm(width, height) {
+  const w = Number(width);
+  const h = Number(height);
+  if (!Number.isFinite(w) || !Number.isFinite(h) || w <= 0 || h <= 0) {
+    throw new Error('ukuran kanvas tidak sah');
+  }
+  const cardW = CR80_MM.width;
+  return [cardW, (cardW * h) / w];
+}
+
+/**
+ * Ukuran halaman (mm) untuk sepasang kartu (depan + belakang) berdampingan,
+ * meniru lembar kartu fisik: dua kartu + celah + margin di tiap sisi.
+ * @returns {{page:[number,number], card:[number,number], gap:number, margin:number}}
+ */
+export function pairPageMm(width, height) {
+  const [cardW, cardH] = cardSizeMm(width, height);
+  const gap = PAIR_GAP_MM;
+  const margin = PAIR_MARGIN_MM;
+  return {
+    page: [cardW * 2 + gap + margin * 2, cardH + margin * 2],
+    card: [cardW, cardH],
+    gap,
+    margin
+  };
 }
 
 /** Inci per milimeter. */

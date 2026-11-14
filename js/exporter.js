@@ -14,7 +14,7 @@
  */
 
 import { SCHEMA, BARCODE_BLOCK } from './schema.js';
-import { pdfPageSizeMm, exportScaleForDpi, effectiveDpi } from './pdf-size.js';
+import { pdfPageSizeMm, pairPageMm, exportScaleForDpi, effectiveDpi } from './pdf-size.js';
 import { layoutSideText, buildTextContent } from './pdf-text.js';
 import { fromFormDate } from './date.js';
 import { composeA4Single, composeA4Sheet, a4CanvasToJpeg, A4_PT } from './a4.js';
@@ -294,99 +294,137 @@ function pdfFieldValue(formData, element) {
 /**
  * Rakit PDF dari daftar halaman.
  *
- * Tiap halaman punya dua lapisan: gambar latar (JPEG) + teks vektor. Font
- * standar Helvetica (F1) dan Helvetica-Bold (F2) tidak perlu berkas tertanam,
- * sehingga teks tetap bisa diseleksi/diedit di pembaca PDF.
+ * Tiap halaman berisi satu atau beberapa "cell" (kartu). Tiap cell punya
+ * gambar latar (JPEG) + posisi/ukuran pada halaman, dan (opsional) teks vektor
+ * di atasnya. Font Helvetica (F1/F2) tidak perlu tertanam, jadi teks tetap
+ * bisa diseleksi/diedit di pembaca PDF.
  *
- * @param {Array<{image:{bytes,width,height}, side:object, formData:object}>} pages
+ * Bentuk halaman:
+ *   { widthPt, heightPt, cells: [{ image, rect:[x,y,w,h] (pt, kiri-bawah),
+ *     side, formData, pxToPt }] }
+ *
+ * Untuk kompatibilitas satu-kartu-per-halaman, {image,side,formData} tunggal
+ * diterima dan diubah menjadi satu cell penuh halaman.
+ *
+ * @param {Array<object>} pages
  */
 function buildPdf(pages, options = {}) {
   const raster = !!options.raster;
   if (!pages.length) throw new Error('Tidak ada halaman untuk dibuat menjadi PDF.');
 
-  const [pageWidthMm, pageHeightMm] = pdfPageSizeMm(SCHEMA.width, SCHEMA.height);
-  const pageWidth = pageWidthMm * MM_TO_PT;
-  const pageHeight = pageHeightMm * MM_TO_PT;
-  const pxToPt = pageWidth / SCHEMA.width;
+  // Normalisasi: halaman tunggal (image) -> model cell penuh.
+  const normPages = pages.map((page) => {
+    if (page.cells) return page;
+    const [wMm, hMm] = pdfPageSizeMm(SCHEMA.width, SCHEMA.height);
+    const wPt = wMm * MM_TO_PT;
+    const hPt = hMm * MM_TO_PT;
+    return {
+      widthPt: wPt,
+      heightPt: hPt,
+      cells: [{
+        image: page.image,
+        rect: [0, 0, wPt, hPt],
+        side: page.side,
+        formData: page.formData,
+        pxToPt: wPt / SCHEMA.width
+      }]
+    };
+  });
 
-  // Nomor objek:
-  //   1 catalog, 2 pages,
-  //   per halaman: page, content, image  (3 objek)
-  //   lalu 2 objek font: F1, F2
-  const pageObjectsStart = 3;
-  const fontHelveticaId = pageObjectsStart + pages.length * 3;
-  const fontBoldId = fontHelveticaId + 1;
+  // Hitung nomor objek: tiap halaman = page + content + (jumlah image).
+  const imageCounts = normPages.map((p) => p.cells.length);
+  const totalImages = imageCounts.reduce((a, b) => a + b, 0);
+  // Alokasi id: 1 catalog, 2 pages, lalu per halaman [page, content, ...images],
+  // lalu 2 font.
+  let next = 3;
+  const pageLayout = normPages.map((page, i) => {
+    const pageId = next++;
+    const contentId = next++;
+    const imageIds = [];
+    for (let k = 0; k < page.cells.length; k += 1) imageIds.push(next++);
+    return { page, pageId, contentId, imageIds, index: i };
+  });
+  const fontHelveticaId = next++;
+  const fontBoldId = next++;
   const objectCount = fontBoldId;
 
   const objects = new Array(objectCount + 1);
-
   objects[1] = enc('1 0 obj\n<< /Type /Catalog /Pages 2 0 R >>\nendobj\n');
 
-  const kids = pages.map((_, index) => `${pageObjectsStart + index * 3} 0 R`).join(' ');
+  const kids = pageLayout.map((p) => `${p.pageId} 0 R`).join(' ');
   objects[2] = enc(
     '2 0 obj\n' +
-    `<< /Type /Pages /Kids [${kids}] /Count ${pages.length} >>\n` +
+    `<< /Type /Pages /Kids [${kids}] /Count ${normPages.length} >>\n` +
     'endobj\n'
   );
 
-  pages.forEach((page, index) => {
-    const pageObject = pageObjectsStart + index * 3;
-    const contentObject = pageObject + 1;
-    const imageObject = pageObject + 2;
-    const imageName = `Im${index + 1}`;
+  pageLayout.forEach(({ page, pageId, contentId, imageIds }) => {
+    const resources = [];
+    const drawImages = [];
 
-    // Lapisan 1: gambar latar penuh halaman.
-    const drawImage =
-      'q\n' +
-      `${pageWidth.toFixed(4)} 0 0 ${pageHeight.toFixed(4)} 0 0 cm\n` +
-      `/${imageName} Do\n` +
-      'Q\n';
+    page.cells.forEach((cell, k) => {
+      const imgName = `Im${pageId}_${k}`;
+      const [x, y, w, h] = cell.rect;
+      drawImages.push(
+        'q\n' +
+        `${w.toFixed(4)} 0 0 ${h.toFixed(4)} ${x.toFixed(4)} ${y.toFixed(4)} cm\n` +
+        `/${imgName} Do\n` +
+        'Q\n'
+      );
+      const imageId = imageIds[k];
+      resources.push(`/${imgName} ${imageId} 0 R`);
+      const image = cell.image;
+      objects[imageId] = concat([
+        enc(
+          `${imageId} 0 obj\n` +
+          '<< /Type /XObject /Subtype /Image ' +
+          `/Width ${image.width} /Height ${image.height} ` +
+          '/ColorSpace /DeviceRGB /BitsPerComponent 8 ' +
+          '/Filter /DCTDecode ' +
+          `/Length ${image.bytes.length} >>\n` +
+          'stream\n'
+        ),
+        image.bytes,
+        enc('\nendstream\nendobj\n')
+      ]);
+    });
 
-    // Lapisan 2: teks vektor. Pada mode raster, teks sudah dibakar ke gambar,
-    // jadi lapisan teks ini dilewati agar PDF tidak berisi teks yang bisa diedit.
+    // Teks vektor per cell (dilewati pada mode raster: sudah dibakar ke gambar).
     let drawText = '';
     if (!raster) {
-      const rows = layoutSideText(
-        page.side,
-        page.formData,
-        (el) => pdfFieldValue(page.formData, el)
-      );
-      drawText = buildTextContent(rows, pxToPt, pageHeight);
+      page.cells.forEach((cell) => {
+        const rows = layoutSideText(
+          cell.side,
+          cell.formData,
+          (el) => pdfFieldValue(cell.formData, el)
+        );
+        // buildTextContent membalik sumbu-y terhadap tinggi halaman. Cell yang
+        // lebih pendek dari halaman diberi offset agar teks jatuh di kartunya.
+        const [cx, cy, , ch] = cell.rect;
+        drawText += buildTextContent(rows, cell.pxToPt, ch, cx, cy);
+      });
     }
 
-    const content = drawImage + drawText;
+    const content = drawImages.join('') + drawText;
     const contentBytes = enc(content);
+    const w = page.widthPt;
+    const h = page.heightPt;
 
-    objects[pageObject] = enc(
-      `${pageObject} 0 obj\n` +
+    objects[pageId] = enc(
+      `${pageId} 0 obj\n` +
       '<< /Type /Page /Parent 2 0 R ' +
-      `/MediaBox [0 0 ${pageWidth.toFixed(4)} ${pageHeight.toFixed(4)}] ` +
+      `/MediaBox [0 0 ${w.toFixed(4)} ${h.toFixed(4)}] ` +
       `/Resources << ` +
-      `/XObject << /${imageName} ${imageObject} 0 R >> ` +
+      `/XObject << ${resources.join(' ')} >> ` +
       `/Font << /F1 ${fontHelveticaId} 0 R /F2 ${fontBoldId} 0 R >> ` +
       '>> ' +
-      `/Contents ${contentObject} 0 R >>\n` +
+      `/Contents ${contentId} 0 R >>\n` +
       'endobj\n'
     );
 
-    objects[contentObject] = concat([
-      enc(`${contentObject} 0 obj\n<< /Length ${contentBytes.length} >>\nstream\n`),
+    objects[contentId] = concat([
+      enc(`${contentId} 0 obj\n<< /Length ${contentBytes.length} >>\nstream\n`),
       contentBytes,
-      enc('\nendstream\nendobj\n')
-    ]);
-
-    const image = page.image;
-    objects[imageObject] = concat([
-      enc(
-        `${imageObject} 0 obj\n` +
-        '<< /Type /XObject /Subtype /Image ' +
-        `/Width ${image.width} /Height ${image.height} ` +
-        '/ColorSpace /DeviceRGB /BitsPerComponent 8 ' +
-        '/Filter /DCTDecode ' +
-        `/Length ${image.bytes.length} >>\n` +
-        'stream\n'
-      ),
-      image.bytes,
       enc('\nendstream\nendobj\n')
     ]);
   });
@@ -432,18 +470,56 @@ function buildPdf(pages, options = {}) {
 }
 
 /**
- * Ekspor kedua sisi menjadi satu PDF.
- *
- * Default: latar raster 300 dpi + teks vektor (bisa diedit).
- * Opsi `raster:true` membakar teks ke gambar (teks tidak bisa diedit),
- * `grayscale:true` membuat hitam-putih (mode fotokopi).
+ * Susun satu halaman "pasangan": kartu depan + belakang berdampingan, tiap
+ * kartu berukuran CR80 (85,6 mm) dengan rasio kanvas terjaga. Mirip lembar
+ * kartu fisik. Mengembalikan objek halaman untuk buildPdf (model cell).
  */
-export async function exportPdfAll(formData = {}, options = {}) {
-  const pages = [];
+async function buildPairPage(formData, options) {
+  const { page, card, gap, margin } = pairPageMm(SCHEMA.width, SCHEMA.height);
+  const pageWpt = page[0] * MM_TO_PT;
+  const pageHpt = page[1] * MM_TO_PT;
+  const cardWpt = card[0] * MM_TO_PT;
+  const cardHpt = card[1] * MM_TO_PT;
+  const marginPt = margin * MM_TO_PT;
+  const gapPt = gap * MM_TO_PT;
+
+  const cells = [];
   for (let index = 0; index < SCHEMA.sides.length; index += 1) {
     const canvas = await renderSideBackgroundCanvas(index, formData, options);
     const image = await canvasToJpeg(canvas);
-    pages.push({ image, side: SCHEMA.sides[index], formData });
+    const x = marginPt + index * (cardWpt + gapPt);
+    cells.push({
+      image,
+      rect: [x, marginPt, cardWpt, cardHpt],
+      side: SCHEMA.sides[index],
+      formData,
+      pxToPt: cardWpt / SCHEMA.width
+    });
+  }
+  return { widthPt: pageWpt, heightPt: pageHpt, cells };
+}
+
+/**
+ * Ekspor kedua sisi menjadi satu PDF.
+ *
+ * Default: layout pasangan (depan + belakang berdampingan, ukuran kartu fisik),
+ * latar raster 300 dpi + teks vektor (bisa diedit). Opsi:
+ *   pair:false     -> satu kartu per halaman (perilaku lama)
+ *   raster:true    -> bakar teks ke gambar (teks tidak bisa diedit)
+ *   grayscale:true -> hitam-putih (mode fotokopi)
+ */
+export async function exportPdfAll(formData = {}, options = {}) {
+  const pair = options.pair !== false;
+  let pages;
+  if (pair) {
+    pages = [await buildPairPage(formData, options)];
+  } else {
+    pages = [];
+    for (let index = 0; index < SCHEMA.sides.length; index += 1) {
+      const canvas = await renderSideBackgroundCanvas(index, formData, options);
+      const image = await canvasToJpeg(canvas);
+      pages.push({ image, side: SCHEMA.sides[index], formData });
+    }
   }
   const blob = buildPdf(pages, options);
   return { blob, filename: exportFilename(formData, null, 'pdf') };
@@ -451,30 +527,36 @@ export async function exportPdfAll(formData = {}, options = {}) {
 
 /**
  * Ekspor banyak peserta menjadi satu PDF multi-halaman (batch).
- * Tiap peserta menghasilkan 2 halaman: sisi depan lalu sisi belakang.
+ *
+ * Default: satu halaman per peserta berisi pasangan (depan + belakang).
+ * Opsi pair:false -> dua halaman per peserta (perilaku lama).
  * @param {object[]} list daftar data peserta
- * @param {object} options {raster, grayscale}
+ * @param {object} options {raster, grayscale, pair}
  * @param {(done:number,total:number)=>void} [onProgress] laporan kemajuan
  * @returns {Promise<{blob:Blob, filename:string, count:number}>}
  */
 export async function exportBatchPdf(list, options = {}, onProgress) {
   const data = Array.isArray(list) ? list : [];
   if (!data.length) throw new Error('Tidak ada data peserta untuk diekspor.');
+  const pair = options.pair !== false;
   const pages = [];
-  const total = data.length * SCHEMA.sides.length;
+  const total = data.length;
   let done = 0;
   let cancelled = false;
   for (const formData of data) {
-    for (let index = 0; index < SCHEMA.sides.length; index += 1) {
-      const canvas = await renderSideBackgroundCanvas(index, formData, options);
-      const image = await canvasToJpeg(canvas);
-      pages.push({ image, side: SCHEMA.sides[index], formData });
-      done += 1;
-      if (typeof onProgress === 'function') {
-        if (onProgress(done, total) === false) { cancelled = true; break; }
+    if (pair) {
+      pages.push(await buildPairPage(formData, options));
+    } else {
+      for (let index = 0; index < SCHEMA.sides.length; index += 1) {
+        const canvas = await renderSideBackgroundCanvas(index, formData, options);
+        const image = await canvasToJpeg(canvas);
+        pages.push({ image, side: SCHEMA.sides[index], formData });
       }
     }
-    if (cancelled) break;
+    done += 1;
+    if (typeof onProgress === 'function') {
+      if (onProgress(done, total) === false) { cancelled = true; break; }
+    }
   }
   if (cancelled) throw new Error('cancelled');
   const blob = buildPdf(pages, options);

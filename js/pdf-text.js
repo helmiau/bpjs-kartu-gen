@@ -163,13 +163,13 @@ export function layoutSideText(side, formData, valueOf) {
  *
  * @param {{text:string,x:number,y:number,fontSize:number,bold:boolean}} row
  * @param {number} scale  px -> pt  (pageWidthPt / canvasWidth)
- * @param {number} pageHeightPt tinggi halaman, untuk membalik sumbu y
+ * @param {number} cellHeightPt tinggi sel/kartu (pt), untuk membalik sumbu y
  */
-export function rowToPdfOperators(row, scale, pageHeightPt) {
+export function rowToPdfOperators(row, scale, cellHeightPt, offsetXPt = 0, offsetYPt = 0) {
   const fontSizePt = row.fontSize * scale;
-  // y kanvas dari atas; PDF dari bawah.
-  const yPt = pageHeightPt - row.y * scale;
-  const xPt = row.x * scale;
+  // y kanvas dari atas; PDF dari bawah. Offset menggeser sel ke kartunya.
+  const yPt = offsetYPt + (cellHeightPt - row.y * scale);
+  const xPt = offsetXPt + row.x * scale;
   if (!row.text) return '';
   return (
     `BT /${row.bold ? 'F2' : 'F1'} ${fontSizePt.toFixed(3)} Tf ` +
@@ -183,8 +183,10 @@ export function rowToPdfOperators(row, scale, pageHeightPt) {
  *
  * @param {Array} rows keluaran layoutSideText
  * @param {number} scale px -> pt
- * @param {number} pageHeightPt tinggi halaman PDF (pt)
+ * @param {number} cellHeightPt tinggi sel/kartu (pt), untuk membalik sumbu y
+ * @param {number} [offsetXpt] geser x sel dari tepi kiri halaman
+ * @param {number} [offsetYpt] geser y sel dari tepi bawah halaman
  */
-export function buildTextContent(rows, scale, pageHeightPt) {
-  return rows.map((row) => rowToPdfOperators(row, scale, pageHeightPt)).join('');
+export function buildTextContent(rows, scale, cellHeightPt, offsetXpt = 0, offsetYpt = 0) {
+  return rows.map((row) => rowToPdfOperators(row, scale, cellHeightPt, offsetXpt, offsetYpt)).join('');
 }

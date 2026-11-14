@@ -9,7 +9,7 @@
   <link rel="icon" type="image/svg+xml" href="assets/img/bpjs-mark.svg">
   <link rel="icon" type="image/png" sizes="512x512" href="assets/img/bpjs-icon-512.png">
   <link rel="apple-touch-icon" href="assets/img/bpjs-icon-180.png">
-  <link rel="stylesheet" href="assets/css/style.css?v=1.8.1">
+  <link rel="stylesheet" href="assets/css/style.css?v=1.8.2">
   <link rel="manifest" href="manifest.json">
   <meta name="theme-color" content="#0d9488">
   <script>
@@ -321,10 +321,17 @@
           <input type="checkbox" id="autoCapsToggle" checked>
           <span data-i18n="preview.autoCaps">Huruf kapital otomatis untuk nama</span>
         </label>
-        <label class="barcode-toggle" for="photoCopyToggle">
-          <input type="checkbox" id="photoCopyToggle">
-          <span data-i18n="preview.copy">Fotokopi hitam-putih (JPG &amp; PDF)</span>
-        </label>
+        <div class="field-group" role="radiogroup" aria-label="Layout PDF" data-i18n-aria="preview.pdfLayout">
+          <span class="field-label" data-i18n="preview.pdfLayout">Layout PDF</span>
+          <label class="barcode-toggle" for="pdfPair">
+            <input type="radio" name="pdfLayout" id="pdfPair" value="pair" checked>
+            <span data-i18n="preview.pdfPair">Sepasang kartu (depan + belakang) ukuran fisik</span>
+          </label>
+          <label class="barcode-toggle" for="pdfSingle">
+            <input type="radio" name="pdfLayout" id="pdfSingle" value="single">
+            <span data-i18n="preview.pdfSingle">Satu kartu per halaman</span>
+          </label>
+        </div>
         <label class="barcode-toggle" for="rasterPdfToggle">
           <input type="checkbox" id="rasterPdfToggle">
           <span data-i18n="preview.raster">Rasterisasi PDF (teks tidak bisa diedit)</span>
@@ -496,9 +503,9 @@
     <span class="toast-msg" id="toastMsg"></span>
   </div>
   <!-- Pustaka yang di-vendor; tidak ada pemuatan dari CDN saat runtime. -->
-  <script src="assets/vendor/JsBarcode.all.min.js?v=1.8.1"></script>
-  <script src="assets/vendor/jsQR.js?v=1.8.1"></script>
-  <script type="module" src="js/app.js?v=1.8.1"></script>
+  <script src="assets/vendor/JsBarcode.all.min.js?v=1.8.2"></script>
+  <script src="assets/vendor/jsQR.js?v=1.8.2"></script>
+  <script type="module" src="js/app.js?v=1.8.2"></script>
   <script>
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', function () {
