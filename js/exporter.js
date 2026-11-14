@@ -463,15 +463,20 @@ export async function exportBatchPdf(list, options = {}, onProgress) {
   const pages = [];
   const total = data.length * SCHEMA.sides.length;
   let done = 0;
+  let cancelled = false;
   for (const formData of data) {
     for (let index = 0; index < SCHEMA.sides.length; index += 1) {
       const canvas = await renderSideBackgroundCanvas(index, formData, options);
       const image = await canvasToJpeg(canvas);
       pages.push({ image, side: SCHEMA.sides[index], formData });
       done += 1;
-      if (typeof onProgress === 'function') onProgress(done, total);
+      if (typeof onProgress === 'function') {
+        if (onProgress(done, total) === false) { cancelled = true; break; }
+      }
     }
+    if (cancelled) break;
   }
+  if (cancelled) throw new Error('cancelled');
   const blob = buildPdf(pages, options);
   return { blob, filename: `KARTU-BPJS-BATCH-${data.length}-peserta.pdf`, count: data.length };
 }

@@ -693,17 +693,34 @@ async function exportBatch() {
     return;
   }
   if (btn) btn.disabled = true;
+  const progressBar = document.getElementById('batchProgress');
+  const progressFill = document.getElementById('batchProgressFill');
+  const cancelBtn = document.getElementById('batchCancelBtn');
+  let exportCancelled = false;
+  if (progressBar) progressBar.hidden = false;
+  if (progressFill) progressFill.style.width = '0%';
+  if (cancelBtn) cancelBtn.hidden = false;
+  cancelBtn?.addEventListener('click', () => { exportCancelled = true; }, { once: true });
   try {
     const opts = { grayscale: !!document.getElementById('photoCopyToggle')?.checked, raster: !!document.getElementById('rasterPdfToggle')?.checked, watermark: copyMarkEnabled() };
     const { blob, filename } = await exportBatchPdf(selected, opts, (done, total) => {
-      if (status) { status.textContent = `Membuat PDF ${done}/${total}...`; status.dataset.kind = 'busy'; }
+      if (status) { status.textContent = t('batch.exporting', { done, total }); status.dataset.kind = 'busy'; }
+      if (progressFill) progressFill.style.width = `${Math.round((done / total) * 100)}%`;
+      return exportCancelled ? false : undefined;
     });
     downloadBlob(blob, filename);
-    if (status) { status.textContent = `Selesai: ${selected.length} kartu (${selected.length * 2} halaman).`; status.dataset.kind = 'success'; }
+    if (status) { status.textContent = t('batch.exportDone', { count: selected.length, pages: selected.length * 2 }); status.dataset.kind = 'success'; }
   } catch (error) {
-    if (status) { status.textContent = error.message || 'Gagal membuat PDF.'; status.dataset.kind = 'error'; }
+    if (error.message === 'cancelled') {
+      if (status) { status.textContent = t('batch.exportCancelled'); status.dataset.kind = 'error'; }
+    } else {
+      if (status) { status.textContent = error.message || t('batch.exportErr'); status.dataset.kind = 'error'; }
+    }
   } finally {
     if (btn) btn.disabled = false;
+    if (progressBar) progressBar.hidden = true;
+    if (progressFill) progressFill.style.width = '0%';
+    if (cancelBtn) { cancelBtn.hidden = true; }
   }
 }
 

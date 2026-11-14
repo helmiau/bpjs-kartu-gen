@@ -247,6 +247,10 @@
 
         <div class="download-actions">
           <button type="button" id="batchExportPdfBtn" class="btn btn-primary" data-i18n="batch.export">Unduh PDF massal</button>
+          <button type="button" id="batchCancelBtn" class="btn btn-clear btn-small" hidden data-i18n="batch.cancel">Batal</button>
+        </div>
+        <div class="progress-bar" id="batchProgress" hidden>
+          <div class="progress-fill" id="batchProgressFill"></div>
         </div>
         <p class="hint export-status" id="batchExportStatus" role="status" aria-live="polite"></p>
       </div><!-- /#batchMode -->

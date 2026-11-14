@@ -485,6 +485,21 @@ textarea { resize: vertical; }
 .batch-pane .batch-template { margin-bottom: var(--space-2); }
 .batch-pane .hint { margin-bottom: var(--space-2); }
 .batch-pane .button-row { margin-top: var(--space-2); }
+/* Bilah kemajuan ekspor batch. */
+.progress-bar {
+  height: 6px;
+  margin-top: var(--space-2);
+  border-radius: 999px;
+  background: var(--surface-container);
+  overflow: hidden;
+}
+.progress-fill {
+  height: 100%;
+  width: 0;
+  border-radius: 999px;
+  background: var(--accent);
+  transition: width .2s ease;
+}
 .btn-small { min-height: 34px; padding: 5px 10px; font-size: 12px; }
 
 /* ---------------- Panel pratinjau ---------------- */
