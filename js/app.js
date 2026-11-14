@@ -467,11 +467,15 @@ async function bindChangelog() {
   let loaded = null;
 
   function renderMarkdown(src) {
-    // Parser markdown minimalis untuk CHANGELOG: # h2, ## versi, ### seksi, - list, teks biasa.
+    // Parser markdown minimalis untuk CHANGELOG: ## versi, ### seksi, - list, teks biasa.
+    // Lewati semuanya sebelum heading versi pertama (## [..]) — judul dokumen
+    // dan paragraf pembuka Keep a Changelog tidak perlu tampil di modal.
     const lines = src.split(/\r?\n/);
+    const start = lines.findIndex((l) => /^##\s+\[/.test(l));
+    const body = start > 0 ? lines.slice(start) : lines;
     const out = [];
     let inList = false;
-    for (const line of lines) {
+    for (const line of body) {
       const h2 = /^##\s+(.+)$/.exec(line);
       const h3 = /^###\s+(.+)$/.exec(line);
       const li = /^-\s+(.+)$/.exec(line);

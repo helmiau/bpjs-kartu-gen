@@ -2,7 +2,7 @@
  * Service Worker: cache-first untuk aset inti, offline penuh.
  * Versi naik lewat CACHE_NAME untuk membatalkan cache lama.
  */
-const CACHE_NAME = 'bpjs-card-gen-v2';
+const CACHE_NAME = 'bpjs-card-gen-v3';
 const ASSETS = [
   './',
   './index.html',
@@ -32,11 +32,18 @@ self.addEventListener('activate', (event) => {
 // Cache-first dengan fallback jaringan; simpan respons OK ke cache.
 self.addEventListener('fetch', (event) => {
   if (event.request.method !== 'GET') return;
+  const url = new URL(event.request.url);
+  // Dokumen yang sering berubah (changelog) selalu ambil dari jaringan agar
+  // tidak tersaji versi cache lama.
+  if (/\.md$/i.test(url.pathname)) {
+    event.respondWith(fetch(event.request).catch(() => caches.match(event.request)));
+    return;
+  }
   event.respondWith(
     caches.match(event.request).then((hit) => {
       if (hit) return hit;
       return fetch(event.request).then((res) => {
-        if (res && res.ok && new URL(event.request.url).origin === self.location.origin) {
+        if (res && res.ok && url.origin === self.location.origin) {
           const clone = res.clone();
           caches.open(CACHE_NAME).then((cache) => cache.put(event.request, clone));
         }
