@@ -167,6 +167,69 @@ body {
   gap: var(--space-2);
   flex: none;
 }
+
+/* Tombol menu (hamburger) header: hanya tampil di mobile. */
+.header-menu-btn { display: none; }
+.header-menu {
+  position: absolute;
+  top: calc(100% + 6px);
+  right: var(--space-4);
+  min-width: 210px;
+  z-index: 200;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: var(--space-2);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  box-shadow: var(--shadow-lg, 0 12px 40px rgba(0, 0, 0, .3));
+}
+.header-menu[hidden] { display: none; }
+.header-menu-item {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  min-height: 40px;
+  padding: 8px 12px;
+  font: inherit;
+  font-size: 14px;
+  text-align: left;
+  color: var(--text);
+  background: transparent;
+  border: none;
+  border-radius: 6px;
+  text-decoration: none;
+  cursor: pointer;
+}
+.header-menu-item:hover { background: var(--surface-container); }
+.header-menu-lang {
+  display: inline-flex;
+  gap: 2px;
+  margin-top: 4px;
+  padding: 2px;
+  background: var(--surface-low);
+  border: 1px solid color-mix(in srgb, var(--border) 70%, transparent);
+  border-radius: var(--radius-sm);
+}
+.header-menu-lang .lang-btn {
+  flex: 1 1 0;
+  min-height: 32px;
+  font: inherit;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-outline);
+  background: transparent;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+}
+.header-menu-lang .lang-btn[aria-pressed="true"] { background: var(--surface); color: var(--accent); box-shadow: var(--shadow); }
+@media (max-width: 640px) {
+  .header-actions { display: none; }
+  .header-menu-btn { display: inline-flex; }
+  .site-header { position: relative; }
+}
 .lang-switch {
   display: inline-flex;
   align-items: center;
@@ -927,3 +990,5 @@ textarea { resize: vertical; }
 .modal-body p { margin: var(--space-1) 0; font-size: 13px; }
 .modal-body ul { margin: var(--space-1) 0; padding-left: 1.1em; font-size: 13px; }
 .modal-body li { margin-bottom: 3px; }
+.modal-body .about-actions { display: flex; flex-wrap: wrap; gap: var(--space-2); margin: var(--space-3) 0; }
+.modal-body .about-body .watermark { margin-top: var(--space-3); font-size: 12px; color: var(--text-muted); }

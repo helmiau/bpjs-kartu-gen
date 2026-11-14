@@ -454,16 +454,19 @@ function bind() {
   document.getElementById('themeToggle')?.addEventListener('click', toggleTheme);
   bindBatch();
   bindChangelog();
+  bindAbout();
   bindLangButtons();
+  bindHeaderMenu();
   bindCollapse();
 }
 
 /* ---------------- Modal catatan versi ---------------- */
+let openChangelog = () => {}; // diisi bindChangelog, dipakai modal About
+
 async function bindChangelog() {
   const modal = document.getElementById('changelogModal');
-  const versionBtn = document.getElementById('appVersion');
   const body = document.getElementById('changelogBody');
-  if (!modal || !versionBtn) return;
+  if (!modal) return;
   let loaded = null;
 
   function renderMarkdown(src) {
@@ -472,10 +475,10 @@ async function bindChangelog() {
     // dan paragraf pembuka Keep a Changelog tidak perlu tampil di modal.
     const lines = src.split(/\r?\n/);
     const start = lines.findIndex((l) => /^##\s+\[/.test(l));
-    const body = start > 0 ? lines.slice(start) : lines;
+    const linesBody = start >= 0 ? lines.slice(start) : lines;
     const out = [];
     let inList = false;
-    for (const line of body) {
+    for (const line of linesBody) {
       const h2 = /^##\s+(.+)$/.exec(line);
       const h3 = /^###\s+(.+)$/.exec(line);
       const li = /^-\s+(.+)$/.exec(line);
@@ -492,33 +495,41 @@ async function bindChangelog() {
     return escapeHtml(text).replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>');
   }
 
-  async function openModal() {
-    if (body) {
-      if (loaded === null) {
-        body.innerHTML = `<p>${escapeHtml(t('changelog.loading'))}</p>`;
-        try {
-          const res = await fetch('CHANGELOG.md', { cache: 'no-store' });
-          loaded = await res.text();
-        } catch {
-          loaded = t('changelog.err');
-        }
-        body.innerHTML = loaded.startsWith(t('changelog.err')) ? `<p>${escapeHtml(loaded)}</p>` : renderMarkdown(loaded);
-      }
-    }
-    modal.hidden = false;
-    document.body.style.overflow = 'hidden';
-    const closeBtn = modal.querySelector('[data-close-changelog]');
-    if (closeBtn) closeBtn.focus();
-  }
   function closeModal() {
     modal.hidden = true;
     document.body.style.overflow = '';
   }
+  openChangelog = async () => {
+    if (body && loaded === null) {
+      body.innerHTML = `<p>${escapeHtml(t('changelog.loading'))}</p>`;
+      try {
+        const res = await fetch('CHANGELOG.md', { cache: 'no-store' });
+        loaded = await res.text();
+      } catch {
+        loaded = t('changelog.err');
+      }
+      body.innerHTML = loaded.startsWith(t('changelog.err')) ? `<p>${escapeHtml(loaded)}</p>` : renderMarkdown(loaded);
+    }
+    modal.hidden = false;
+    document.body.style.overflow = 'hidden';
+    modal.querySelector('[data-close-changelog]')?.focus();
+  };
 
-  versionBtn.addEventListener('click', openModal);
-  document.getElementById('changelogBtn')?.addEventListener('click', openModal);
   modal.querySelectorAll('[data-close-changelog]').forEach((el) => el.addEventListener('click', closeModal));
   document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && !modal.hidden) closeModal(); });
+}
+
+/* ---------------- Modal tentang aplikasi ---------------- */
+function bindAbout() {
+  const modal = document.getElementById('aboutModal');
+  const btn = document.getElementById('aboutBtn');
+  if (!modal) return;
+  const open = () => { modal.hidden = false; document.body.style.overflow = 'hidden'; modal.querySelector('[data-close-about]')?.focus(); };
+  const close = () => { modal.hidden = true; document.body.style.overflow = ''; };
+  btn?.addEventListener('click', open);
+  modal.querySelectorAll('[data-close-about]').forEach((el) => el.addEventListener('click', close));
+  document.getElementById('aboutChangelogBtn')?.addEventListener('click', () => { close(); openChangelog(); });
+  document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && !modal.hidden) close(); });
 }
 /* ---------------- Batch processing ---------------- */
 /** Antrean peserta: [{ peseta, ok, errors, selected }]. */
@@ -898,18 +909,46 @@ function bindBatch() {
 /* ---------------- Bahasa (ID/EN) ---------------- */
 /** Pasang tombol switch bahasa; sinkronkan aria-pressed. */
 function bindLangButtons() {
-  const langId = document.getElementById('langIdBtn');
-  const langEn = document.getElementById('langEnBtn');
-  if (!langId || !langEn) return;
-  const apply = (lang) => setLang(lang, () => {
-    langId.setAttribute('aria-pressed', String(lang === 'id'));
-    langEn.setAttribute('aria-pressed', String(lang === 'en'));
+  const pairs = [
+    ['langIdBtn', 'langEnBtn'],
+    ['langIdBtnMobile', 'langEnBtnMobile']
+  ];
+  const setPressed = (lang) => {
+    pairs.forEach(([id, en]) => {
+      document.getElementById(id)?.setAttribute('aria-pressed', String(lang === 'id'));
+      document.getElementById(en)?.setAttribute('aria-pressed', String(lang === 'en'));
+    });
+  };
+  pairs.forEach(([id, en]) => {
+    document.getElementById(id)?.addEventListener('click', () => setLang('id', () => setPressed('id')));
+    document.getElementById(en)?.addEventListener('click', () => setLang('en', () => setPressed('en')));
   });
-  langId.addEventListener('click', () => apply('id'));
-  langEn.addEventListener('click', () => apply('en'));
-  const active = currentLang();
-  langId.setAttribute('aria-pressed', String(active === 'id'));
-  langEn.setAttribute('aria-pressed', String(active === 'en'));
+  setPressed(currentLang());
+}
+
+/** Pasang menu header (mobile): toggle + aksi changelog/tema. */
+function bindHeaderMenu() {
+  const btn = document.getElementById('headerMenuBtn');
+  const menu = document.getElementById('headerMenu');
+  if (!btn || !menu) return;
+  const close = () => { menu.hidden = true; btn.setAttribute('aria-expanded', 'false'); };
+  const open = () => { menu.hidden = false; btn.setAttribute('aria-expanded', 'true'); };
+  btn.addEventListener('click', (e) => {
+    e.stopPropagation();
+    if (menu.hidden) open(); else close();
+  });
+  document.addEventListener('click', (e) => {
+    if (!menu.hidden && !menu.contains(e.target) && e.target !== btn) close();
+  });
+  document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && !menu.hidden) close(); });
+  menu.querySelectorAll('[data-menu-action]').forEach((item) => {
+    item.addEventListener('click', () => {
+      const action = item.dataset.menuAction;
+      if (action === 'about') document.getElementById('aboutBtn')?.click();
+      else if (action === 'theme') document.getElementById('themeToggle')?.click();
+      close();
+    });
+  });
 }
  /* ---------------- Panel collapsible ---------------- */
 /** Konfigurasi panel yang bisa dilipat. */

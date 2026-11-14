@@ -9,7 +9,7 @@
   <link rel="icon" type="image/svg+xml" href="assets/img/bpjs-mark.svg">
   <link rel="icon" type="image/png" sizes="512x512" href="assets/img/bpjs-icon-512.png">
   <link rel="apple-touch-icon" href="assets/img/bpjs-icon-180.png">
-  <link rel="stylesheet" href="assets/css/style.css?v=1.7.9">
+  <link rel="stylesheet" href="assets/css/style.css?v=1.8.0">
   <link rel="manifest" href="manifest.json">
   <meta name="theme-color" content="#0d9488">
   <script>
@@ -36,13 +36,12 @@
         </div>
       </div>
       <div class="header-actions">
-        <button type="button" class="icon-btn changelog-btn" id="changelogBtn"
-          aria-label="Catatan versi" title="Catatan versi" data-i18n-aria="changelog.btnAria" data-i18n-title="changelog.btnTitle">
+        <button type="button" class="icon-btn about-btn" id="aboutBtn"
+          aria-label="Tentang aplikasi" title="Tentang aplikasi" data-i18n-aria="about.btnAria" data-i18n-title="about.btnTitle">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-            <path d="M4 4h11l5 5v11a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V5a1 1 0 0 1 1-1z"></path>
-            <path d="M15 4v5h5"></path>
-            <line x1="8" y1="13" x2="16" y2="13"></line>
-            <line x1="8" y1="17" x2="14" y2="17"></line>
+            <circle cx="12" cy="12" r="9"></circle>
+            <line x1="12" y1="11" x2="12" y2="16"></line>
+            <line x1="12" y1="8" x2="12" y2="8.01"></line>
           </svg>
         </button>
         <div class="lang-switch" role="group" aria-label="Pilihan bahasa" data-i18n-aria="header.lang">
@@ -61,13 +60,22 @@
             <path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"></path>
           </svg>
         </button>
-        <a class="icon-btn" href="https://github.com/helmiau/bpjs-kartu-gen"
-           target="_blank" rel="noopener noreferrer"
-           aria-label="Lihat kode sumber di GitHub" title="Kode sumber di GitHub" data-i18n-aria="header.github" data-i18n-title="header.github">
-          <svg viewBox="0 0 16 16" fill="currentColor" aria-hidden="true">
-            <path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82a7.5 7.5 0 0 1 4 0c1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8z"></path>
-          </svg>
-        </a>
+      </div>
+      <button type="button" class="icon-btn header-menu-btn" id="headerMenuBtn"
+        aria-label="Menu" aria-expanded="false" aria-controls="headerMenu" data-i18n-aria="header.menuAria">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true">
+          <line x1="3" y1="6" x2="21" y2="6"></line>
+          <line x1="3" y1="12" x2="21" y2="12"></line>
+          <line x1="3" y1="18" x2="21" y2="18"></line>
+        </svg>
+      </button>
+      <div class="header-menu" id="headerMenu" hidden>
+        <button type="button" class="header-menu-item" data-menu-action="about" data-i18n="about.title">Tentang Aplikasi</button>
+        <button type="button" class="header-menu-item" data-menu-action="theme" data-i18n="header.themeTitle">Ganti tema</button>
+        <div class="header-menu-lang" role="group" aria-label="Pilihan bahasa" data-i18n-aria="header.lang">
+          <button type="button" id="langIdBtnMobile" class="lang-btn" aria-pressed="true">ID</button>
+          <button type="button" id="langEnBtnMobile" class="lang-btn" aria-pressed="false">EN</button>
+        </div>
       </div>
     </div>
   </header>
@@ -431,27 +439,39 @@
     </section>
   </main>
 
-  <footer class="site-footer">
-    <div class="wrap">
-      <p class="disclaimer" data-i18n-html="footer.warning">
-        <strong>Perhatian:</strong> kartu yang dihasilkan adalah tiruan visual untuk keperluan
-        latihan atau pratinjau. Kartu ini <strong>tidak sah secara hukum</strong> dan tidak
-        diverifikasi oleh BPJS Kesehatan.
-      </p>
-      <p class="note" data-i18n="footer.note">
-        Tidak ada data yang dikirim ke server. Semua proses berjalan di peramban Anda.
-      </p>
-      <p class="footer-badge"><span class="badge-local" data-i18n="header.badge">100% di perangkat Anda</span></p>
-      <p class="watermark">
-        <span data-i18n="footer.made">Dibuat oleh</span>
-        <a href="https://github.com/helmiau" target="_blank" rel="noopener noreferrer">helmiau</a>
-        &middot;
-        <a href="https://github.com/helmiau/bpjs-kartu-gen" target="_blank" rel="noopener noreferrer" data-i18n="footer.source">kode sumber</a>
-        &middot;
-        <button type="button" class="app-version version-btn" id="appVersion" data-i18n-aria="footer.versionAria">v1.7.5</button>
-      </p>
+  <!-- Modal tentang aplikasi (menggantikan footer) -->
+  <div class="modal" id="aboutModal" role="dialog" aria-modal="true" aria-labelledby="aboutTitle" hidden>
+    <div class="modal-backdrop" data-close-about></div>
+    <div class="modal-dialog">
+      <div class="modal-head">
+        <h2 id="aboutTitle" data-i18n="about.title">Tentang Aplikasi</h2>
+        <button type="button" class="icon-btn" data-close-about aria-label="Tutup" data-i18n-aria="about.closeAria">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+        </button>
+      </div>
+      <div class="modal-body about-body">
+        <p class="disclaimer" data-i18n-html="footer.warning">
+          <strong>Perhatian:</strong> kartu yang dihasilkan adalah tiruan visual untuk keperluan
+          latihan atau pratinjau. Kartu ini <strong>tidak sah secara hukum</strong> dan tidak
+          diverifikasi oleh BPJS Kesehatan.
+        </p>
+        <p class="note" data-i18n="footer.note">
+          Tidak ada data yang dikirim ke server. Semua proses berjalan di peramban Anda.
+        </p>
+        <p class="footer-badge"><span class="badge-local" data-i18n="header.badge">100% di perangkat Anda</span></p>
+        <div class="about-actions">
+          <button type="button" class="btn btn-secondary btn-small" id="aboutChangelogBtn" data-i18n="changelog.title">Catatan Versi</button>
+          <a class="btn btn-secondary btn-small" href="https://github.com/helmiau/bpjs-kartu-gen" target="_blank" rel="noopener noreferrer" data-i18n="footer.source">kode sumber</a>
+        </div>
+        <p class="watermark">
+          <span data-i18n="footer.made">Dibuat oleh</span>
+          <a href="https://github.com/helmiau" target="_blank" rel="noopener noreferrer">helmiau</a>
+          &middot;
+          <span class="app-version" id="appVersion">v1.8.0</span>
+        </p>
+      </div>
     </div>
-  </footer>
+  </div>
   <!-- Modal catatan versi -->
   <div class="modal" id="changelogModal" role="dialog" aria-modal="true" aria-labelledby="changelogTitle" hidden>
     <div class="modal-backdrop" data-close-changelog></div>
@@ -470,9 +490,9 @@
     <span class="toast-msg" id="toastMsg"></span>
   </div>
   <!-- Pustaka yang di-vendor; tidak ada pemuatan dari CDN saat runtime. -->
-  <script src="assets/vendor/JsBarcode.all.min.js?v=1.7.9"></script>
-  <script src="assets/vendor/jsQR.js?v=1.7.9"></script>
-  <script type="module" src="js/app.js?v=1.7.9"></script>
+  <script src="assets/vendor/JsBarcode.all.min.js?v=1.8.0"></script>
+  <script src="assets/vendor/jsQR.js?v=1.8.0"></script>
+  <script type="module" src="js/app.js?v=1.8.0"></script>
   <script>
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', function () {
