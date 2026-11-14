@@ -4,6 +4,15 @@ Semua perubahan penting dicatat di sini. Format mengikuti
 [Keep a Changelog](https://keepachangelog.com/id/1.0.0/), versi mengikuti
 [SemVer](https://semver.org/lang/id/).
 
+## [1.7.5] - 2026-11-14
+
+### Diperbaiki
+- **CSS tidak termuat**: commit PWA (1.7.3) tak sengaja mengganti baris
+  `<link rel="stylesheet">` dengan manifest, sehingga halaman tampil tanpa
+  gaya. Link CSS dikembalikan.
+- Service worker: naikkan cache ke v2 + `skipWaiting` + `clients.claim`
+  agar peramban yang menyimpan HTML lama langsung mengambil versi baru.
+
 ## [1.7.4] - 2026-11-14
 
 ### Ditambah

@@ -6,4 +6,4 @@
  * (CSS, vendor, app.js) dengan angka di sini agar peramban mengambil berkas
  * baru, bukan versi cache lama. Ikuti versi di package.json.
  */
-export const APP_VERSION = '1.7.4';
+export const APP_VERSION = '1.7.5';

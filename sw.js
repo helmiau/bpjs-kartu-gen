@@ -2,7 +2,7 @@
  * Service Worker: cache-first untuk aset inti, offline penuh.
  * Versi naik lewat CACHE_NAME untuk membatalkan cache lama.
  */
-const CACHE_NAME = 'bpjs-card-gen-v1';
+const CACHE_NAME = 'bpjs-card-gen-v2';
 const ASSETS = [
   './',
   './index.html',
@@ -15,6 +15,7 @@ const ASSETS = [
 // cukup cache runtime: simpan apa pun yang berhasil diminta pertama kali.
 
 self.addEventListener('install', (event) => {
+  self.skipWaiting();
   event.waitUntil(
     caches.open(CACHE_NAME).then((cache) => cache.addAll(ASSETS).catch(() => {}))
   );
@@ -24,7 +25,7 @@ self.addEventListener('activate', (event) => {
   event.waitUntil(
     caches.keys().then((keys) =>
       Promise.all(keys.filter((k) => k !== CACHE_NAME).map((k) => caches.delete(k)))
-    )
+    ).then(() => self.clients.claim())
   );
 });
 
