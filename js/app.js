@@ -762,6 +762,30 @@ function bindBatch() {
       const files = e.dataTransfer && e.dataTransfer.files;
       if (files && files.length) handleBatchFiles(files);
     });
+    // Tempel langsung ke dropzone: gambar QR → pindai; teks → isi textarea tempel.
+    dropzone.addEventListener('paste', async (e) => {
+      const items = e.clipboardData && e.clipboardData.items;
+      if (items) {
+        const images = [];
+        for (const item of items) {
+          if (item.type && item.type.startsWith('image/')) {
+            const file = item.getAsFile();
+            if (file) images.push(file);
+          }
+        }
+        if (images.length) { e.preventDefault(); handleBatchFiles(images); return; }
+      }
+      const text = e.clipboardData && e.clipboardData.getData('text/plain');
+      if (text && text.trim()) {
+        e.preventDefault();
+        const box = document.getElementById('batchPasteInput');
+        if (box) {
+          box.value = box.value ? `${box.value}\n${text}` : text;
+          document.getElementById('batchTabPasteBtn')?.click();
+          document.getElementById('batchPasteBtn')?.click();
+        }
+      }
+    });
   }
   fileInput?.addEventListener('change', async () => {
     const files = fileInput.files ? Array.from(fileInput.files) : [];
