@@ -324,7 +324,7 @@ function loadFromUrl() {
 /** Pasang seluruh pengikat ke elemen halaman. */
 function bind() {
   document.querySelectorAll('.dynamic-input, #pesertaForm input, #pesertaForm textarea').forEach((el) => {
-    el.addEventListener('input', refresh);
+    el.addEventListener('input', () => { refresh(); persistState(); });
   });
 
   document.getElementById('fillFromB64Btn')?.addEventListener('click', () => {
@@ -460,6 +460,46 @@ function bind() {
 /** Antrean peserta: [{ peseta, ok, errors, selected }]. */
 let batchRows = [];
 
+/* ---------------- Persistensi lokal ---------------- */
+const STORE_KEY = 'bpjs-card-gen/v1';
+
+/** Simpan form single + antrean batch ke localStorage. */
+function persistState() {
+  try {
+    const single = {};
+    FIELDS.forEach((name) => {
+      const el = document.getElementById(name);
+      if (el) single[name] = el.value;
+    });
+    localStorage.setItem(STORE_KEY, JSON.stringify({
+      single,
+      batch: batchRows.map((r) => ({ peserta: r.peserta, ok: r.ok, errors: r.errors, selected: r.selected }))
+    }));
+  } catch { /* localStorage penuh/di-block: abaikan */ }
+}
+
+/** Pulihkan form single + antrean batch dari localStorage. */
+function restoreState() {
+  let raw = null;
+  try { raw = localStorage.getItem(STORE_KEY); } catch { return; }
+  if (!raw) return;
+  try {
+    const state = JSON.parse(raw);
+    if (state.single) {
+      FIELDS.forEach((name) => {
+        if (typeof state.single[name] === 'string') {
+          const el = document.getElementById(name);
+          if (el) el.value = state.single[name];
+        }
+      });
+    }
+    if (Array.isArray(state.batch)) {
+      batchRows = state.batch.map((r) => ({ ...r, peserta: r.peserta || {} }));
+      if (batchRows.length) renderBatch();
+    }
+  } catch { /* data korup: mulai kosong */ }
+}
+
 /** Ganti tab Single/Batch. */
 function setMode(mode) {
   const single = mode === 'single';
@@ -552,6 +592,7 @@ function renderBatch() {
     });
   });
   syncPreviewAfterBatch();
+  persistState();
 }
 
 /** Setelah antrean batch berubah: segarkan pratinjau + navigasi kartu. */
@@ -836,6 +877,7 @@ window.addEventListener('resize', fitPreviews, { passive: true });
 function boot() {
   initI18n();
   bind();
+  restoreState();
   loadFromUrl();
   refresh();
   fitPreviews();
