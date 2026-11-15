@@ -4,6 +4,14 @@ All notable changes are recorded here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and versioning
 follows [SemVer](https://semver.org/).
 
+## [1.8.4] - 2026-11-15
+
+### Fixed
+- **Closed usage guide visible at page bottom**: the shared `.modal-dialog`
+  rule set `display: flex`, which overrode the native `<dialog>` hidden state,
+  so the closed guide rendered inline. The guide now uses its own display rule
+  (`:not([open])` hidden) and is centered when open.
+
 ## [1.8.3] - 2026-11-15
 
 ### Added
