@@ -1004,6 +1004,19 @@ dialog.help-dialog:not([open]) { display: none; }
 .help-dialog .modal-body li { padding-left: 4px; margin-bottom: 12px; }
 .section-head [data-help] { flex: none; }
 @media (max-width: 640px) {
-  .section-head { flex-wrap: wrap; }
-  .section-head [data-help] { margin-left: auto; }
+  .panel > .section-head {
+    display: grid;
+    grid-template-columns: 28px minmax(0, 1fr) 36px 36px;
+    align-items: start;
+    gap: 8px;
+  }
+  .panel > .section-head .head-icon { width: 28px; height: 32px; border: 0; background: transparent; }
+  .panel > .section-head .head-icon svg { width: 20px; height: 20px; }
+  .panel > .section-head .head-text { grid-column: 2; }
+  .panel > .section-head h2 { display: block; font-size: 15px; line-height: 1.4; overflow-wrap: anywhere; }
+  .panel > .section-head h2 .pill-tag { display: table; margin-top: 5px; }
+  .panel > .section-head .sub { margin-top: 5px; font-size: 12px; line-height: 1.5; }
+  .panel > .section-head [data-help] { grid-column: 3; grid-row: 1; width: 36px; height: 36px; padding: 0; display: inline-flex; align-items: center; justify-content: center; }
+  .panel > .section-head .collapse-toggle { grid-column: 4; grid-row: 1; width: 36px; height: 36px; }
+  .preview-panel > .section-head .head-text { grid-column: 2 / -1; }
 }
