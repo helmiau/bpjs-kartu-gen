@@ -4,6 +4,14 @@ All notable changes are recorded here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and versioning
 follows [SemVer](https://semver.org/).
 
+## [1.8.3] - 2026-11-15
+
+### Added
+- Usage guides on each collapsible panel: Participant Data, Render & Visual
+  Settings, and A4 Duplex. A complete guide is available inside About.
+- Guides support Indonesian and English, keyboard focus containment, Escape
+  dismissal, and focus restoration to the opening button.
+
 ## [1.8.2] - 2026-11-15
 
 ### Added

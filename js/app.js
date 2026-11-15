@@ -18,6 +18,7 @@ import { readBatchFile, parseDelimited, mapRows, validateBatch, classifyBatchLin
 import { initI18n, setLang, currentLang, t } from './i18n.js';
 import { downloadTemplate } from './templates.js';
 import { APP_VERSION } from './version.js';
+import { bindHelp } from './help.js';
 
 const FIELDS = ['nomorKartu', 'nama', 'alamat', 'tglLhr', 'nik', 'fktp', 'fktpGigi', 'statusPeserta'];
 
@@ -459,6 +460,7 @@ function bind() {
   bindAbout();
   bindLangButtons();
   bindHeaderMenu();
+  bindHelp();
   bindCollapse();
 }
 
