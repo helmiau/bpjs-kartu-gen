@@ -67,11 +67,15 @@ export function bindHelp() {
     if (!anchor) continue;
     const button = document.createElement('button');
     button.type = 'button';
-    button.className = 'btn btn-secondary btn-small';
+    button.className = 'btn btn-secondary btn-small help-btn';
     button.dataset.help = topic;
-    button.dataset.i18n = 'help.button';
-    button.textContent = (guides[currentLang()] || guides.id).button;
     button.setAttribute('aria-haspopup', 'dialog');
+    button.dataset.i18nAria = 'help.button';
+    button.dataset.i18nTitle = 'help.button';
+    const label = (guides[currentLang()] || guides.id).button;
+    button.setAttribute('aria-label', label);
+    button.title = label;
+    button.innerHTML = '<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="9"></circle><line x1="12" y1="11" x2="12" y2="16"></line><line x1="12" y1="8" x2="12" y2="8.01"></line></svg>';
     button.addEventListener('click', (event) => { event.stopPropagation(); open(topic, button); });
     anchor.before(button);
   }
