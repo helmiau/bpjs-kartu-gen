@@ -4,6 +4,13 @@ All notable changes are recorded here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and versioning
 follows [SemVer](https://semver.org/).
 
+## [1.8.5] - 2026-11-15
+
+### Changed
+- Usage guide buttons are now compact info (i) icons, keeping the accessible
+  label and tooltip. Version bump also refreshes the service worker cache so
+  the updated script reaches returning visitors.
+
 ## [1.8.4] - 2026-11-15
 
 ### Fixed

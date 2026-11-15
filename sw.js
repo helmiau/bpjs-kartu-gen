@@ -2,7 +2,7 @@
  * Service Worker: cache-first untuk aset inti, offline penuh.
  * Versi naik lewat CACHE_NAME untuk membatalkan cache lama.
  */
-const CACHE_NAME = 'bpjs-card-gen-v3';
+const CACHE_NAME = 'bpjs-card-gen-v4';
 const ASSETS = [
   './',
   './index.html',
